@@ -1,14 +1,9 @@
-import type { LinksFunction } from "@remix-run/cloudflare";
-import {
-  Links,
-  LiveReload,
-  Meta,
-  Outlet,
-  Scripts,
-  ScrollRestoration,
-} from "@remix-run/react";
+import type { LinksFunction } from '@remix-run/cloudflare'
+import { Links, LiveReload, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
 
-export const links: LinksFunction = () => []
+import tailwind from '~/styles/tailwind.css'
+
+export const links: LinksFunction = () => [{ rel: 'stylesheet', href: tailwind }]
 
 export default function App() {
   return (
@@ -26,5 +21,5 @@ export default function App() {
         <LiveReload />
       </body>
     </html>
-  );
+  )
 }

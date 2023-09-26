@@ -5,10 +5,15 @@
   "type": "module",
   "scripts": {
     "build": "remix build",
+    "check-format": "biome format ./app",
+    "check-types": "tsc",
     "dev": "remix dev --manual -c \"npm run start\"",
+    "format": "biome format --write ./app",
+    "lint": "biome check ./app",
+    "pages:deploy": "pnpm run build && wrangler pages deploy ./public",
     "start": "wrangler pages dev --compatibility-date=2023-06-21 ./public",
     "typecheck": "tsc",
-    "pages:deploy": "pnpm run build && wrangler pages deploy ./public"
+    "validate": "pnpm check-types && pnpm check-format && pnpm lint"
   },
   "dependencies": {
     "@remix-run/cloudflare": "^2.0.1",
@@ -19,12 +24,14 @@
     "react-dom": "^18.2.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.2.2",
     "@cloudflare/workers-types": "^4.20230922.0",
     "@remix-run/dev": "^2.0.1",
     "@types/react": "^18.2.23",
     "@types/react-dom": "^18.2.7",
+    "tailwindcss": "^3.3.3",
     "typescript": "^5.2.2",
-    "wrangler": "^3.9.1"
+    "wrangler": "3.8.0"
   },
   "engines": {
     "node": ">=18.0.0"
