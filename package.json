@@ -1,0 +1,32 @@
+{
+  "name": "readlog",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "scripts": {
+    "build": "remix build",
+    "dev": "remix dev --manual -c \"npm run start\"",
+    "start": "wrangler pages dev --compatibility-date=2023-06-21 ./public",
+    "typecheck": "tsc",
+    "pages:deploy": "pnpm run build && wrangler pages deploy ./public"
+  },
+  "dependencies": {
+    "@remix-run/cloudflare": "^2.0.1",
+    "@remix-run/cloudflare-pages": "^2.0.1",
+    "@remix-run/react": "^2.0.1",
+    "isbot": "^3.7.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "@cloudflare/workers-types": "^4.20230922.0",
+    "@remix-run/dev": "^2.0.1",
+    "@types/react": "^18.2.23",
+    "@types/react-dom": "^18.2.7",
+    "typescript": "^5.2.2",
+    "wrangler": "^3.9.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
