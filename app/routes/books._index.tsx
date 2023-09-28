@@ -1,5 +1,5 @@
 import type { MetaFunction } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+import { Link, useLoaderData } from '@remix-run/react'
 
 import { BooksSchema } from '~/schemas/bookSchema'
 
@@ -16,7 +16,7 @@ export async function loader() {
   return books
 }
 
-export default function BooksPage() {
+export default function BooksRoute() {
   const loaderData = useLoaderData<typeof loader>()
 
   return (
@@ -26,8 +26,15 @@ export default function BooksPage() {
         {loaderData.items.map((book) => {
           return (
             <li key={book.id}>
-              <span>{book.volumeInfo.title}</span>
-              <img alt={book.volumeInfo.title} src={book.volumeInfo.imageLinks.thumbnail} />
+              <Link to={`./${book.id}`}>
+                <span>{book.volumeInfo.title}</span>
+                <img
+                  alt={book.volumeInfo.title}
+                  height="180px"
+                  src={book.volumeInfo.imageLinks.thumbnail}
+                  width="120px"
+                />
+              </Link>
             </li>
           )
         })}
