@@ -10,7 +10,7 @@ export const BookSchema = z.object({
     publisher: z.string(),
     publishedDate: z.string(),
     description: z.string(),
-    industryIdentifiers: z.array(z.object({ type: z.string(), identifier: z.string() })),
+    industryIdentifiers: z.array(z.object({ type: z.string(), identifier: z.string() })).optional(),
     pageCount: z.number(),
     categories: z.array(z.string()),
     imageLinks: z.object({
@@ -36,7 +36,7 @@ export const BookDetailSchema = z.object({
     publisher: z.string(),
     publishedDate: z.string(),
     description: z.string(),
-    industryIdentifiers: z.array(z.object({ type: z.string(), identifier: z.string() })),
+    industryIdentifiers: z.array(z.object({ type: z.string(), identifier: z.string() })).optional(),
     pageCount: z.number(),
     printedPageCount: z.number(),
     categories: z.array(z.string()),
