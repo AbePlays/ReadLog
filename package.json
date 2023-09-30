@@ -5,10 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "remix build",
-    "check-format": "biome format .",
+    "check-format": "biome format ./app",
     "check-types": "tsc",
-    "dev": "remix dev --manual -c \"npm run start\"",
-    "format": "biome format --write .",
+    "dev": "remix dev --manual -c \"pnpm start\"",
+    "format": "biome format --write ./app",
     "lint": "biome check ./app",
     "pages:deploy": "pnpm run build && wrangler pages deploy ./public",
     "start": "wrangler pages dev --compatibility-date=2023-06-21 ./public",
