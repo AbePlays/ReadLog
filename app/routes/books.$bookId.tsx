@@ -8,9 +8,11 @@ export const meta: MetaFunction = () => {
   return [{ title: 'A Book' }, { name: 'description', content: 'Welcome to ReadLog!' }]
 }
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ context, params }: LoaderFunctionArgs) {
   const bookId = z.string().parse(params.bookId)
-  const response = await fetch(`https://www.googleapis.com/books/v1/volumes/${bookId}`)
+  const response = await fetch(
+    `https://www.googleapis.com/books/v1/volumes/${bookId}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
+  )
   const data = await response.json()
   const bookDetails = BookDetailSchema.parse(data)
   return bookDetails

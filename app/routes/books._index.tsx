@@ -1,4 +1,4 @@
-import type { MetaFunction } from '@remix-run/cloudflare'
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
 import { Link, useLoaderData } from '@remix-run/react'
 
 import { BooksSchema } from '~/schemas/bookSchema'
@@ -7,9 +7,9 @@ export const meta: MetaFunction = () => {
   return [{ title: 'Books' }, { name: 'description', content: 'Welcome to ReadLog!' }]
 }
 
-export async function loader() {
+export async function loader({ context }: LoaderFunctionArgs) {
   const res = await fetch(
-    "https://www.googleapis.com/books/v1/volumes?q=subject:'fiction','nonfiction','mystery','science','fantasy'&orderBy=relevance"
+    `https://www.googleapis.com/books/v1/volumes?q=subject:'fiction','nonfiction','mystery','science','fantasy'&orderBy=relevance&key=${context.env.GOOGLE_BOOKS_API_KEY}`
   )
   const data = await res.json()
   const books = BooksSchema.parse(data)
