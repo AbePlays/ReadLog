@@ -21,8 +21,10 @@ export default function BooksRoute() {
 
   return (
     <div>
-      <h1 className="bg-red-200 text-center p-2">Popular Books</h1>
-      <ul>
+      <h1 className="bg-red-200 text-center p-2" id="popular-books">
+        Popular Books
+      </h1>
+      <ul aria-labelledby="popular-books">
         {loaderData.items.map((book) => {
           return (
             <li key={book.id}>
