@@ -90,14 +90,14 @@ test.beforeEach(async ({ page }) => {
 
   const booksList = page.getByRole('list', { name: 'Popular Books' })
   const books = booksList.getByRole('listitem')
-  expect(books).toHaveCount(DUMMY_BOOKS_RESPONSE.items.length)
+  await expect(books).toHaveCount(DUMMY_BOOKS_RESPONSE.items.length)
   const bookLink = books.nth(0).getByRole('link')
   await bookLink.click()
 })
 
 test('has a link back to books route', async ({ page }) => {
   const booksLink = page.getByRole('link', { name: 'Back to Books' })
-  expect(booksLink).toHaveAttribute('href', '/books')
+  await expect(booksLink).toHaveAttribute('href', '/books')
 })
 
 test('has book title and description', async ({ page }) => {

@@ -59,16 +59,19 @@ test('has Popular Books heading', async ({ page }) => {
 test('has book title and image in each book in the list', async ({ page }) => {
   const booksList = page.getByRole('list', { name: 'Popular Books' })
   const books = booksList.getByRole('listitem')
-  expect(books).toHaveCount(DUMMY_RESPONSE.items.length)
 
-  DUMMY_RESPONSE.items.forEach((item, index) => {
-    const book = books.nth(index)
-    expect(book).toContainText(item.volumeInfo.title)
+  await expect(books).toHaveCount(DUMMY_RESPONSE.items.length)
 
+  for (let i = 0; i < DUMMY_RESPONSE.items.length; ++i) {
+    const book = books.nth(i)
+    const item = DUMMY_RESPONSE.items[i]
+
+    const bookTitle = book.getByRole('heading', { level: 2 })
     const bookLink = book.getByRole('link')
     const bookImage = book.getByRole('img')
 
-    expect(bookLink).toHaveAttribute('href', `/books/${item.id}`)
-    expect(bookImage).toHaveAttribute('src', item.volumeInfo.imageLinks.thumbnail)
-  })
+    await expect(bookTitle).toHaveText(item.volumeInfo.title)
+    await expect(bookLink).toHaveAttribute('href', `/books/${item.id}`)
+    await expect(bookImage).toHaveAttribute('src', item.volumeInfo.imageLinks.thumbnail)
+  }
 })
