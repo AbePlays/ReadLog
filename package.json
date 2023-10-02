@@ -8,15 +8,13 @@
     "check-format": "biome format ./app",
     "check-types": "tsc",
     "dev": "remix dev --manual -c \"pnpm start\"",
-    "dev:test": "remix dev --manual -c \"pnpm start:test\"",
+    "dev:test": "remix dev --manual -c \"pnpm start --binding CI=\"true\"\"",
     "format": "biome format --write ./app",
     "lint": "biome check ./app",
     "pages:deploy": "pnpm run build && wrangler pages deploy ./public",
     "start": "wrangler pages dev --compatibility-date=2023-06-21 ./public",
-    "start:test": "wrangler pages dev --compatibility-date=2023-06-21 ./public --binding CI='true'",
-    "test": "playwright test",
-    "test:dev": "playwright test --ui",
-    "typecheck": "tsc",
+    "test:e2e": "playwright test",
+    "test:e2e:dev": "playwright test --ui",
     "validate": "pnpm check-types && pnpm check-format && pnpm lint"
   },
   "dependencies": {
