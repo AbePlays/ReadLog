@@ -29,7 +29,7 @@ export default function BooksRoute() {
           return (
             <li key={book.id}>
               <Link to={`./${book.id}`}>
-                <span>{book.volumeInfo.title}</span>
+                <h2>{book.volumeInfo.title}</h2>
                 <img
                   alt={book.volumeInfo.title}
                   height="180px"
