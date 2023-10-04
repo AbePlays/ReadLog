@@ -27,7 +27,7 @@ export default function BookRoute() {
       <img
         alt={loaderData.volumeInfo.title}
         height="450px"
-        src={loaderData.volumeInfo.imageLinks.small}
+        src={loaderData.volumeInfo.imageLinks?.smallThumbnail}
         width="300px"
       />
       <h1 className="font-bold">{loaderData.volumeInfo.title}</h1>

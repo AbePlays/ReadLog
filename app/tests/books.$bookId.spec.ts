@@ -29,5 +29,5 @@ test('has a link back to books route', async ({ page }) => {
 
 test('has book title and description', async ({ page }) => {
   await expect(page.getByRole('heading', { name: `${DUMMY_BOOK_RESPONSE.volumeInfo.title}` })).toBeInViewport()
-  await expect(page.getByRole('paragraph')).toHaveText(DUMMY_BOOK_RESPONSE.volumeInfo.description)
+  await expect(page.getByRole('paragraph').first()).toHaveText(DUMMY_BOOK_RESPONSE.volumeInfo.description)
 })
