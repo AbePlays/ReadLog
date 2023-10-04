@@ -2,7 +2,7 @@ import type { MetaFunction } from '@remix-run/cloudflare'
 import { Link } from '@remix-run/react'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'ReadLog' }, { name: 'description', content: 'Welcome to ReadLog!' }]
+  return [{ title: 'Home - ReadLog' }, { name: 'description', content: 'Welcome to ReadLog!' }]
 }
 
 export default function IndexRoute() {

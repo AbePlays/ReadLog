@@ -4,7 +4,13 @@ import { Form, Link, useLoaderData, useNavigation, useSearchParams } from '@remi
 import { BookSearchSchema } from '~/schemas/bookSchema'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Search' }, { name: 'description', content: 'Welcome to ReadLog!' }]
+  return [
+    { title: 'Book Search - ReadLog' },
+    {
+      name: 'description',
+      content: 'Search for books, discover new titles, and find your favorite reads online'
+    }
+  ]
 }
 
 export async function loader({ context, request }: LoaderFunctionArgs) {

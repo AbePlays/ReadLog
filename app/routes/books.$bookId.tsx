@@ -4,8 +4,17 @@ import { z } from 'zod'
 
 import { BookDetailSchema } from '~/schemas/bookSchema'
 
-export const meta: MetaFunction = () => {
-  return [{ title: 'A Book' }, { name: 'description', content: 'Welcome to ReadLog!' }]
+export const meta: MetaFunction<typeof loader> = ({ data }) => {
+  if (data) {
+    const match = data.volumeInfo.description?.match(/[^.!?]+[.!?]+\s/)
+    const description = match ? match[0].trim() : data.volumeInfo.description ?? ''
+    return [{ title: data.volumeInfo.title }, { name: 'description', content: description }]
+  }
+
+  return [
+    { title: '404 Book not found - ReadLog' },
+    { name: 'description', content: "Oops! The page you're looking for doesn't exist." }
+  ]
 }
 
 export async function loader({ context, params }: LoaderFunctionArgs) {

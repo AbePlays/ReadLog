@@ -4,7 +4,13 @@ import { Link, useLoaderData } from '@remix-run/react'
 import { BooksSchema } from '~/schemas/bookSchema'
 
 export const meta: MetaFunction = () => {
-  return [{ title: 'Books' }, { name: 'description', content: 'Welcome to ReadLog!' }]
+  return [
+    { title: 'Popular Books - ReadLog' },
+    {
+      name: 'description',
+      content: 'Explore a curated collection of popular books. Find your next great read on our platform.'
+    }
+  ]
 }
 
 export async function loader({ context }: LoaderFunctionArgs) {
@@ -33,7 +39,7 @@ export default function BooksRoute() {
                 <img
                   alt={book.volumeInfo.title}
                   height="180px"
-                  src={book.volumeInfo.imageLinks.thumbnail}
+                  src={book.volumeInfo.imageLinks?.thumbnail}
                   width="120px"
                 />
               </Link>
