@@ -39,11 +39,18 @@ export default function SearchRoute() {
     <div>
       <h1 className="bg-red-200 text-center p-2">Search books</h1>
       <Form action="/search" method="get">
-        <input className="border w-full p-2" defaultValue={query} name="q" placeholder="Search books" type="search" />
+        <input
+          aria-label="Search books"
+          className="border w-full p-2"
+          defaultValue={query}
+          name="q"
+          placeholder="Search books"
+          type="search"
+        />
       </Form>
       {state === 'loading' ? <span>Loading Books...</span> : null}
       {state === 'idle' ? (
-        <ul>
+        <ul aria-label="Search Results">
           {loaderData?.items?.map((book) => {
             return (
               <li key={book.id}>
