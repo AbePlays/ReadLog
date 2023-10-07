@@ -4,7 +4,7 @@ export const BookSchema = z.object({
   id: z.string(),
   etag: z.string(),
   volumeInfo: z.object({
-    title: z.string(),
+    title: z.string().optional(),
     subtitle: z.string().optional(),
     authors: z.array(z.string()).optional(),
     publisher: z.string().optional(),

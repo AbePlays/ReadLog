@@ -31,8 +31,10 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
 export default function SearchRoute() {
   const loaderData = useLoaderData<typeof loader>()
-  const { state } = useNavigation()
+  const { location, state } = useNavigation()
   const [searchParams] = useSearchParams()
+
+  const isLoadingBooks = state === 'loading' && location.pathname === '/search'
   const query = searchParams.get('q') ?? ''
 
   return (
@@ -48,26 +50,24 @@ export default function SearchRoute() {
           type="search"
         />
       </Form>
-      {state === 'loading' ? <span>Loading Books...</span> : null}
-      {state === 'idle' ? (
-        <ul aria-label="Search Results">
-          {loaderData?.items?.map((book) => {
-            return (
-              <li key={book.id}>
-                <Link to={`/books/${book.id}`}>
-                  <h2>{book.volumeInfo.title}</h2>
-                  <img
-                    alt={`Cover of a book titled ${book.volumeInfo.title}`}
-                    height="180px"
-                    src={book.volumeInfo?.imageLinks?.thumbnail}
-                    width="120px"
-                  />
-                </Link>
-              </li>
-            )
-          })}
-        </ul>
-      ) : null}
+      {isLoadingBooks ? <span>Loading Books...</span> : null}
+      <ul aria-label="Search Results" className={isLoadingBooks ? 'pointer-events-none opacity-30' : ''}>
+        {loaderData?.items?.map((book) => {
+          return (
+            <li key={book.id}>
+              <Link to={`/books/${book.id}`}>
+                <h2>{book.volumeInfo.title}</h2>
+                <img
+                  alt={`Cover of a book titled ${book.volumeInfo.title}`}
+                  height="180px"
+                  src={book.volumeInfo?.imageLinks?.thumbnail}
+                  width="120px"
+                />
+              </Link>
+            </li>
+          )
+        })}
+      </ul>
     </div>
   )
 }
