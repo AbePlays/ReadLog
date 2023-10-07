@@ -1,5 +1,15 @@
 import type { LinksFunction } from '@remix-run/cloudflare'
-import { Links, LiveReload, Meta, NavLink, Outlet, Scripts, ScrollRestoration } from '@remix-run/react'
+import {
+  Links,
+  LiveReload,
+  Meta,
+  NavLink,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+  isRouteErrorResponse,
+  useRouteError
+} from '@remix-run/react'
 
 import tailwind from '~/styles/tailwind.css'
 
@@ -39,6 +49,39 @@ export default function App() {
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
+      </body>
+    </html>
+  )
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError()
+  console.error(error)
+
+  let errorMessage = 'Something went wrong'
+
+  if (isRouteErrorResponse(error) && error.data) {
+    errorMessage = error.data
+  }
+
+  return (
+    <html lang="en">
+      <head>
+        <title>Oh no!</title>
+        <meta charSet="utf-8" />
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <h1 className="font-bold text-2xl">{errorMessage}</h1>
+        <p>
+          Please raise an issue on the project's{' '}
+          <a className="underline" href="https://github.com/AbePlays/ReadLog" rel="noreferrer" target="_blank">
+            GitHub repository
+          </a>{' '}
+          if the problem persists.
+        </p>
       </body>
     </html>
   )
