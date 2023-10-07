@@ -37,6 +37,9 @@ export default function App() {
               <li>
                 <NavLink to="/search">Search</NavLink>
               </li>
+              <li className="ml-auto">
+                <NavLink to="/auth">Your Account</NavLink>
+              </li>
             </ul>
           </nav>
         </header>
