@@ -1,0 +1,6 @@
+{
+  "databaseURL": "https://Abe-s-workspace-v85lfu.eu-central-1.xata.sh/db/read-log",
+  "codegen": {
+    "output": "app/libs/xata.ts"
+  }
+}

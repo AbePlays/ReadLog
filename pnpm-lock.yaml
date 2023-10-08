@@ -14,6 +14,9 @@ dependencies:
   '@remix-run/react':
     specifier: ^2.0.1
     version: 2.0.1(react-dom@18.2.0)(react@18.2.0)(typescript@5.2.2)
+  '@xata.io/client':
+    specifier: ^0.26.7
+    version: 0.26.7(typescript@5.2.2)
   isbot:
     specifier: ^3.7.0
     version: 3.7.0
@@ -1581,6 +1584,14 @@ packages:
 
   /@web3-storage/multipart-parser@1.0.0:
     resolution: {integrity: sha512-BEO6al7BYqcnfX15W2cnGR+Q566ACXAT9UQykORCWW80lmkpWsnEob6zJS1ZVBKsSJC8+7vJkHwlp+lXG1UCdw==}
+
+  /@xata.io/client@0.26.7(typescript@5.2.2):
+    resolution: {integrity: sha512-XSHpAplYKOFu+LUFA+6z7jn2xf0tXFt0NxPH0IP1qIsIeVPcuUZYvTgID7iZWiaPrQKT8A024NH5uiQIcA1snQ==}
+    peerDependencies:
+      typescript: '>=4.5'
+    dependencies:
+      typescript: 5.2.2
+    dev: false
 
   /accepts@1.3.8:
     resolution: {integrity: sha512-PYAthTa2m2VKxuvSD3DPC/Gy+U+sOA1LAuT8mkmRuvw+NACSaeXEQ+NHcVF7rONl6qcaxV3Uuemwawk+7+SJLw==}
