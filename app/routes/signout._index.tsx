@@ -1,4 +1,4 @@
-import { ActionFunctionArgs, createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
+import { type ActionFunctionArgs, createCookieSessionStorage, redirect } from '@remix-run/cloudflare'
 
 export async function loader() {
   return redirect('/')
