@@ -124,7 +124,7 @@ export default function AuthRoute() {
           </Form>
         </div>
       ) : (
-        <Form action={`/auth${search}`} method="post">
+        <Form action={`/auth${search}`} aria-label={`${isSignupForm ? 'sign up' : 'sign in'} form`} method="post">
           <fieldset disabled={state === 'submitting'}>
             <input
               defaultChecked={!isSignupForm}
