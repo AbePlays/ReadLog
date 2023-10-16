@@ -8,7 +8,7 @@ test.beforeEach(async ({ page }) => {
   })
 
   await page.route(`/books/${DUMMY_BOOK_RESPONSE.id}?_data=routes%2Fbooks.%24bookId`, async (route) => {
-    await route.fulfill({ json: DUMMY_BOOK_RESPONSE })
+    await route.fulfill({ json: { bookDetails: DUMMY_BOOK_RESPONSE, userDetails: { userBook: null, userId: null } } })
   })
 
   await page.goto('/')
