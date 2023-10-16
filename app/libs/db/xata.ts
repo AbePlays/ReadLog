@@ -11,6 +11,14 @@ const tables = [
       { name: 'email', type: 'email', unique: true },
       { name: 'registration_date', type: 'datetime', notNull: true, defaultValue: 'now' }
     ]
+  },
+  {
+    name: 'user_books',
+    columns: [
+      { name: 'user_id', type: 'string' },
+      { name: 'book_id', type: 'string' },
+      { name: 'read_status', type: 'string' }
+    ]
   }
 ] as const
 
@@ -20,8 +28,12 @@ export type InferredTypes = SchemaInference<SchemaTables>
 export type Users = InferredTypes['users']
 export type UsersRecord = Users & XataRecord
 
+export type UserBooks = InferredTypes['user_books']
+export type UserBooksRecord = UserBooks & XataRecord
+
 export type DatabaseSchema = {
   users: UsersRecord
+  user_books: UserBooksRecord
 }
 
 const DatabaseClient = buildClient()
