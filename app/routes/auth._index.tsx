@@ -2,14 +2,14 @@ import {
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
   type MetaFunction,
-  createCookieSessionStorage,
   json,
   redirect
 } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
 
-import { signin, signup } from '~/libs/db/userRegistration.server'
+import { signin, signup } from '~/libs/db/user.server'
 import { signinSchema, signupSchema } from '~/schemas/authSchema'
+import { getUserId, getUserSessionStorage } from '~/utils/session.server'
 
 export const meta: MetaFunction = () => {
   return [
@@ -19,41 +19,14 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const { getSession } = createCookieSessionStorage({
-    cookie: {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      name: 'READLOG_SESSION',
-      path: '/',
-      sameSite: 'lax',
-      secrets: [context.env.SESSION_SECRET],
-      secure: true
-    }
-  })
-
-  const session = await getSession(request.headers.get('cookie'))
-  if (session.get('userId')) {
-    return { isLoggedIn: true }
-  }
-
-  return { isLoggedIn: false }
+  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  return { userId }
 }
 
 export async function action({ context, request }: ActionFunctionArgs) {
   const fields = Object.fromEntries(await request.formData())
 
-  const { getSession, commitSession } = createCookieSessionStorage({
-    cookie: {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 7 days
-      name: 'READLOG_SESSION',
-      path: '/',
-      sameSite: 'lax',
-      secrets: [context.env.SESSION_SECRET],
-      secure: true
-    }
-  })
-
+  const { commitSession, getSession } = getUserSessionStorage(context.env.SESSION_SECRET)
   const session = await getSession()
 
   if (fields.authType === 'signin') {
@@ -116,7 +89,7 @@ export default function AuthRoute() {
   return (
     <div>
       <h1 className="bg-red-200 text-center p-2">Get Started with ReadLog</h1>
-      {loaderData.isLoggedIn ? (
+      {loaderData.userId ? (
         <div>
           <span>You're logged in</span>
           <Form action="/signout" method="post">

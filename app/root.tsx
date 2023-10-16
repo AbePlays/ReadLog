@@ -26,7 +26,7 @@ export default function App() {
       </head>
       <body>
         <header>
-          <nav aria-label="Main" className="p-4">
+          <nav aria-label="Main" className="p-4 border-b">
             <ul className="flex gap-4">
               <li>
                 <NavLink to="/">ReadLog</NavLink>

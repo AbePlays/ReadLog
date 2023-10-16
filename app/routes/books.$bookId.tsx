@@ -2,9 +2,9 @@ import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, js
 import { Link, useLoaderData, useNavigation, useSubmit } from '@remix-run/react'
 import { z } from 'zod'
 
-import { getUserId } from '~/libs/db/userRegistration.server'
 import { getXataClient } from '~/libs/db/xata'
 import { BookDetailSchema } from '~/schemas/bookSchema'
+import { getUserId } from '~/utils/session.server'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
   if (data) {
@@ -80,7 +80,7 @@ export default function BookRoute() {
     <div>
       <Link to="/books">Back to Books</Link>
       <img
-        alt={loaderData.bookDetails.volumeInfo.title}
+        alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}
         height="450px"
         src={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail}
         width="300px"
