@@ -1,4 +1,4 @@
-import type { LinksFunction } from '@remix-run/cloudflare'
+import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
 import {
   Links,
   LiveReload,
@@ -8,14 +8,23 @@ import {
   Scripts,
   ScrollRestoration,
   isRouteErrorResponse,
+  useLoaderData,
   useRouteError
 } from '@remix-run/react'
 
 import tailwind from '~/styles/tailwind.css'
+import { getUserId } from './utils/session.server'
 
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: tailwind }]
 
+export async function loader({ context, request }: LoaderFunctionArgs) {
+  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  return { userId }
+}
+
 export default function App() {
+  const { userId } = useLoaderData<typeof loader>()
+
   return (
     <html lang="en">
       <head>
@@ -37,6 +46,11 @@ export default function App() {
               <li>
                 <NavLink to="/search">Search</NavLink>
               </li>
+              {userId ? (
+                <li>
+                  <NavLink to="/library">Library</NavLink>
+                </li>
+              ) : null}
               <li className="ml-auto">
                 <NavLink to="/auth">Your Account</NavLink>
               </li>

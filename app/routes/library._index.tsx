@@ -1,0 +1,48 @@
+import { type LoaderFunctionArgs, type MetaFunction, redirect } from '@remix-run/cloudflare'
+import { Link, useLoaderData } from '@remix-run/react'
+
+import { getXataClient } from '~/libs/db/xata'
+import { getUserId } from '~/utils/session.server'
+
+export const meta: MetaFunction = () => {
+  return [{ title: 'Library - ReadLog' }, { name: 'description', content: 'Your collection of books on ReadLog!' }]
+}
+
+export async function loader({ context, request }: LoaderFunctionArgs) {
+  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  if (!userId) {
+    return redirect('/auth')
+  }
+
+  const xata = getXataClient(context.env.XATA_API_KEY)
+  const books = await xata.db.user_books.filter({ user_id: userId }).getAll()
+
+  return books
+}
+
+export default function LibraryRoute() {
+  const loaderData = useLoaderData<typeof loader>()
+
+  const hasBooks = Array.isArray(loaderData) && loaderData.length > 0
+
+  return (
+    <div>
+      <h1 className="bg-red-200 text-center p-2" id="your-library">
+        Your ReadLog Library
+      </h1>
+      {hasBooks ? (
+        <ul aria-labelledby="your-library">
+          {loaderData.map((book) => (
+            <li key={book.id}>
+              <span>{book.id}</span> - <span>{book.read_status}</span>
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <p>
+          No books added yet. <Link to="/books">Explore books</Link> to get started.
+        </p>
+      )}
+    </div>
+  )
+}
