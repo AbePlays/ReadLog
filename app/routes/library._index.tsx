@@ -34,7 +34,12 @@ export default function LibraryRoute() {
         <ul aria-labelledby="your-library">
           {loaderData.map((book) => (
             <li key={book.id}>
-              <span>{book.id}</span> - <span>{book.read_status}</span>
+              <Link to={`/books/${book.book_id}`}>
+                <img alt={`Cover of a book titled ${book.name}`} src={book.image_url ?? ''} />
+                <h2 className="font-bold">{book.name}</h2>
+                <span>Reading Status: </span>
+                <span>{book.read_status}</span>
+              </Link>
             </li>
           ))}
         </ul>

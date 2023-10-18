@@ -43,6 +43,8 @@ export async function action({ context, request }: ActionFunctionArgs) {
   const result = z
     .object({
       bookId: z.string(),
+      bookName: z.string(),
+      imageUrl: z.string(),
       readingStatus: z.enum(['not-read', 'reading', 'read']),
       userBookId: z.string().optional(),
       userId: z.string()
@@ -64,6 +66,8 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
   const record = await xata.db.user_books.create({
     book_id: result.data.bookId,
+    image_url: result.data.imageUrl,
+    name: result.data.bookName,
     read_status: result.data.readingStatus,
     user_id: result.data.userId
   })
@@ -90,9 +94,11 @@ export default function BookRoute() {
       {loaderData.userDetails.userId ? (
         <form method="post" onChange={(e) => submit(e.currentTarget)}>
           <fieldset disabled={state !== 'idle'}>
-            <input name="userId" type="hidden" value={loaderData.userDetails.userId} />
             <input name="bookId" type="hidden" value={loaderData.bookDetails.id} />
+            <input name="bookName" type="hidden" value={loaderData.bookDetails.volumeInfo.title} />
+            <input name="imageUrl" type="hidden" value={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail} />
             <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id} />
+            <input name="userId" type="hidden" value={loaderData.userDetails.userId} />
 
             <label htmlFor="reading-status">Reading Status</label>
             <br />
