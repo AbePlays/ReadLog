@@ -23,14 +23,12 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 export default function LibraryRoute() {
   const loaderData = useLoaderData<typeof loader>()
 
-  const hasBooks = Array.isArray(loaderData) && loaderData.length > 0
-
   return (
     <div>
       <h1 className="bg-red-200 text-center p-2" id="your-library">
         Your ReadLog Library
       </h1>
-      {hasBooks ? (
+      {loaderData.length > 0 ? (
         <ul aria-labelledby="your-library">
           {loaderData.map((book) => (
             <li key={book.id}>
