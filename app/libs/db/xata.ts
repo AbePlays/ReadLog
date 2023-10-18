@@ -17,7 +17,9 @@ const tables = [
     columns: [
       { name: 'user_id', type: 'string' },
       { name: 'book_id', type: 'string' },
-      { name: 'read_status', type: 'string' }
+      { name: 'read_status', type: 'string' },
+      { name: 'name', type: 'string' },
+      { name: 'image_url', type: 'string' }
     ]
   }
 ] as const
