@@ -46,7 +46,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       bookName: z.string(),
       imageUrl: z.string(),
       readingStatus: z.enum(['not-read', 'reading', 'read']),
-      userBookId: z.string().optional(),
+      userBookId: z.string(),
       userId: z.string()
     })
     .safeParse(fields)
@@ -97,7 +97,7 @@ export default function BookRoute() {
             <input name="bookId" type="hidden" value={loaderData.bookDetails.id} />
             <input name="bookName" type="hidden" value={loaderData.bookDetails.volumeInfo.title} />
             <input name="imageUrl" type="hidden" value={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail} />
-            <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id} />
+            <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id ?? ''} />
             <input name="userId" type="hidden" value={loaderData.userDetails.userId} />
 
             <label htmlFor="reading-status">Reading Status</label>
