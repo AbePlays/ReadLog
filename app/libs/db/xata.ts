@@ -19,7 +19,8 @@ const tables = [
       { name: 'book_id', type: 'string' },
       { name: 'read_status', type: 'string' },
       { name: 'name', type: 'string' },
-      { name: 'image_url', type: 'string' }
+      { name: 'image_url', type: 'string' },
+      { name: 'reading_history', type: 'json', notNull: true, defaultValue: '[]' }
     ]
   }
 ] as const

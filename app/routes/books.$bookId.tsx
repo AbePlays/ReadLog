@@ -1,9 +1,12 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
-import { Link, useLoaderData, useNavigation, useSubmit } from '@remix-run/react'
+import { Form, Link, useLoaderData, useNavigation } from '@remix-run/react'
+import { useRef } from 'react'
+import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
 import { getXataClient } from '~/libs/db/xata'
 import { BookDetailSchema } from '~/schemas/bookSchema'
+import { formatTime } from '~/utils/formatTime'
 import { getUserId } from '~/utils/session.server'
 
 export const meta: MetaFunction<typeof loader> = ({ data }) => {
@@ -39,15 +42,23 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 }
 
 export async function action({ context, request }: ActionFunctionArgs) {
+  const userId = await getUserId(request, context.env.SESSION_SECRET)
+
+  if (!userId) {
+    return json(
+      { error: 'User ID is missing or invalid. Please provide a valid user ID and try again.' },
+      { status: 400 }
+    )
+  }
   const fields = Object.fromEntries(await request.formData())
   const result = z
     .object({
       bookId: z.string(),
       bookName: z.string(),
       imageUrl: z.string(),
-      readingStatus: z.enum(['not-read', 'reading', 'read']),
-      userBookId: z.string(),
-      userId: z.string()
+      pageNumber: z.string().transform((val) => +val),
+      timeSpent: z.string().transform((val) => +val),
+      userBookId: z.string()
     })
     .safeParse(fields)
 
@@ -57,8 +68,29 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
   const xata = getXataClient(context.env.XATA_API_KEY)
   if (result.data.userBookId) {
-    const record = await xata.db.user_books.update(result.data.userBookId, {
-      read_status: result.data.readingStatus
+    let record = await xata.db.user_books.filter({ id: result.data.userBookId, user_id: userId }).getFirst()
+
+    if (!record) {
+      return json({ error: 'Record not found. Please check your input and try again.' }, { status: 404 })
+    }
+
+    const history = record.reading_history
+
+    if (history.length > 0 && result.data.pageNumber < history[0].page_end) {
+      return json({ error: 'Invalid page number. Please check your input and try again.' }, { status: 400 })
+    }
+
+    record = await xata.db.user_books.update(result.data.userBookId, {
+      reading_history: [
+        {
+          id: crypto.randomUUID(),
+          page_end: result.data.pageNumber,
+          page_start: history[0]?.page_end ?? 0,
+          end_time: new Date(),
+          start_time: new Date(new Date().getTime() - result.data.timeSpent * 1000)
+        },
+        ...history
+      ]
     })
 
     return record
@@ -68,8 +100,17 @@ export async function action({ context, request }: ActionFunctionArgs) {
     book_id: result.data.bookId,
     image_url: result.data.imageUrl,
     name: result.data.bookName,
-    read_status: result.data.readingStatus,
-    user_id: result.data.userId
+    reading_history: [
+      {
+        id: crypto.randomUUID(),
+        page_end: result.data.pageNumber,
+        page_start: 0,
+        end_time: new Date(),
+        start_time: new Date(new Date().getTime() - result.data.timeSpent * 1000)
+      }
+    ],
+    read_status: 'reading',
+    user_id: userId
   })
 
   return record
@@ -78,7 +119,24 @@ export async function action({ context, request }: ActionFunctionArgs) {
 export default function BookRoute() {
   const loaderData = useLoaderData<typeof loader>()
   const { state } = useNavigation()
-  const submit = useSubmit()
+  const dialogRef = useRef<HTMLDialogElement>(null)
+  const { pause, reset, start, status, time } = useTimer()
+
+  const hasTimerStarted = status === 'RUNNING'
+  const hasNotRead = !loaderData.userDetails.userBook
+  const completionPercentage =
+    (loaderData.userDetails.userBook?.reading_history[0]?.page_end * 100) /
+    (loaderData.bookDetails.volumeInfo.pageCount || 1)
+
+  function handleTimer() {
+    if (hasTimerStarted) {
+      pause()
+      dialogRef.current?.showModal()
+    } else {
+      reset()
+      start()
+    }
+  }
 
   return (
     <div>
@@ -92,29 +150,44 @@ export default function BookRoute() {
       <h1 className="font-bold">{loaderData.bookDetails.volumeInfo.title}</h1>
 
       {loaderData.userDetails.userId ? (
-        <form method="post" onChange={(e) => submit(e.currentTarget)}>
+        <>
+          <span>You have completed {completionPercentage}% of the book</span>
+          <button className="block" onClick={handleTimer} type="button">
+            {hasTimerStarted ? formatTime(time) : hasNotRead ? 'Start Reading' : 'Continue Reading'}
+          </button>
+        </>
+      ) : null}
+
+      <dialog className="p-4" ref={dialogRef}>
+        <h2 className="font-bold">Update Reading Progress</h2>
+        <p>Keep your reading on track! Please enter the page number you've reached in the book. </p>
+
+        <Form method="post">
           <fieldset disabled={state !== 'idle'}>
             <input name="bookId" type="hidden" value={loaderData.bookDetails.id} />
             <input name="bookName" type="hidden" value={loaderData.bookDetails.volumeInfo.title} />
             <input name="imageUrl" type="hidden" value={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail} />
             <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id ?? ''} />
-            <input name="userId" type="hidden" value={loaderData.userDetails.userId} />
+            <input name="timeSpent" readOnly type="hidden" value={time} />
 
-            <label htmlFor="reading-status">Reading Status</label>
-            <br />
-            <select
-              defaultValue={loaderData.userDetails.userBook?.read_status ?? ''}
-              name="readingStatus"
-              id="reading-status"
-            >
-              <option value="not-read">Not Read</option>
-              <option value="reading">Reading</option>
-              <option value="read">Read</option>
-            </select>
+            <label htmlFor="pageNumber">Page Number</label>
+            <input
+              className="block"
+              defaultValue={loaderData.userDetails.userBook?.reading_history[0]?.page_end}
+              id="pageNumber"
+              name="pageNumber"
+              type="number"
+            />
+
+            <button onClick={() => dialogRef.current?.close()} type="button">
+              Cancel
+            </button>
+            <button type="submit">Submit</button>
           </fieldset>
-        </form>
-      ) : null}
+        </Form>
+      </dialog>
 
+      <span className="block">Number of Pages: {loaderData.bookDetails.volumeInfo.pageCount}</span>
       <p>{loaderData.bookDetails.volumeInfo.description}</p>
     </div>
   )
