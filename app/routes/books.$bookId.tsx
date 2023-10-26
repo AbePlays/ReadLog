@@ -1,6 +1,6 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
-import { Form, Link, useLoaderData, useNavigation } from '@remix-run/react'
-import { useRef } from 'react'
+import { Form, Link, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
+import { useEffect, useRef } from 'react'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
@@ -46,7 +46,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
 
   if (!userId) {
     return json(
-      { error: 'User ID is missing or invalid. Please provide a valid user ID and try again.' },
+      { success: false, error: 'User ID is missing or invalid. Please provide a valid user ID and try again.' },
       { status: 400 }
     )
   }
@@ -63,7 +63,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     .safeParse(fields)
 
   if (!result.success) {
-    return json({ error: 'Invalid request. Please check your input and try again.' }, { status: 400 })
+    return json({ success: false, error: 'Invalid request. Please check your input and try again.' }, { status: 400 })
   }
 
   const xata = getXataClient(context.env.XATA_API_KEY)
@@ -71,13 +71,19 @@ export async function action({ context, request }: ActionFunctionArgs) {
     let record = await xata.db.user_books.filter({ id: result.data.userBookId, user_id: userId }).getFirst()
 
     if (!record) {
-      return json({ error: 'Record not found. Please check your input and try again.' }, { status: 404 })
+      return json(
+        { success: false, error: 'Record not found. Please check your input and try again.' },
+        { status: 404 }
+      )
     }
 
     const history = record.reading_history
 
     if (history.length > 0 && result.data.pageNumber < history[0].page_end) {
-      return json({ error: 'Invalid page number. Please check your input and try again.' }, { status: 400 })
+      return json(
+        { success: false, error: 'Invalid page number. Please check your input and try again.' },
+        { status: 400 }
+      )
     }
 
     record = await xata.db.user_books.update(result.data.userBookId, {
@@ -93,7 +99,11 @@ export async function action({ context, request }: ActionFunctionArgs) {
       ]
     })
 
-    return record
+    if (!record) {
+      return json({ success: false, error: 'Failed to update the record. Please try again later.' }, { status: 404 })
+    }
+
+    return { success: true, data: record }
   }
 
   const record = await xata.db.user_books.create({
@@ -113,10 +123,11 @@ export async function action({ context, request }: ActionFunctionArgs) {
     user_id: userId
   })
 
-  return record
+  return { success: true, data: record }
 }
 
 export default function BookRoute() {
+  const actionData = useActionData<typeof action>()
   const loaderData = useLoaderData<typeof loader>()
   const { state } = useNavigation()
   const dialogRef = useRef<HTMLDialogElement>(null)
@@ -124,9 +135,15 @@ export default function BookRoute() {
 
   const hasTimerStarted = status === 'RUNNING'
   const hasNotRead = !loaderData.userDetails.userBook
-  const completionPercentage =
-    (loaderData.userDetails.userBook?.reading_history[0]?.page_end * 100) /
-    (loaderData.bookDetails.volumeInfo.pageCount || 1)
+  const currentPageNumber = loaderData.userDetails.userBook?.reading_history[0]?.page_end || 0
+  const completionPercentage = (currentPageNumber * 100) / (loaderData.bookDetails.volumeInfo.pageCount || 1)
+
+  useEffect(() => {
+    // Close dialog if the form is successfully submitted
+    if (actionData?.success) {
+      dialogRef.current?.close()
+    }
+  }, [actionData])
 
   function handleTimer() {
     if (hasTimerStarted) {
@@ -151,9 +168,13 @@ export default function BookRoute() {
 
       {loaderData.userDetails.userId ? (
         <>
-          <span>You have completed {completionPercentage}% of the book</span>
+          {hasNotRead ? null : <span>You have completed {completionPercentage.toFixed(2)}% of the book</span>}
           <button className="block" onClick={handleTimer} type="button">
-            {hasTimerStarted ? formatTime(time) : hasNotRead ? 'Start Reading' : 'Continue Reading'}
+            {hasTimerStarted
+              ? formatTime(time)
+              : hasNotRead
+              ? 'Start Reading'
+              : `Continue Reading from Page ${currentPageNumber}`}
           </button>
         </>
       ) : null}
