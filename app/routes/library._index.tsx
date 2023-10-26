@@ -33,7 +33,12 @@ export default function LibraryRoute() {
           {loaderData.map((book) => (
             <li key={book.id}>
               <Link to={`/books/${book.book_id}`}>
-                <img alt={`Cover of a book titled ${book.name}`} src={book.image_url ?? ''} />
+                <img
+                  alt={`Cover of a book titled ${book.name}`}
+                  height="180px"
+                  src={book.image_url ?? ''}
+                  width="120px"
+                />
                 <h2 className="font-bold">{book.name}</h2>
                 <span>Reading Status: </span>
                 <span>{book.read_status}</span>
