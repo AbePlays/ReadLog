@@ -14,7 +14,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     return redirect('/auth')
   }
 
-  const xata = getXataClient(context.env.XATA_API_KEY)
+  const xata = getXataClient(context.env.XATA_API_KEY, context.env.DB_URL)
   const books = await xata.db.user_books.filter({ user_id: userId }).getAll()
 
   return books

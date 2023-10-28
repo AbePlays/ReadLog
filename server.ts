@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 export const AppEnvSchema = z.object({
   CI: z.string().optional(),
+  DB_URL: z.string(),
   GOOGLE_BOOKS_API_KEY: z.string(),
   SESSION_SECRET: z.string(),
   XATA_API_KEY: z.string()
@@ -24,7 +25,7 @@ export const onRequest = createPagesFunctionHandler({
   build,
   getLoadContext: (context) => {
     if (context.env.CI) {
-      return { env: { GOOGLE_BOOKS_API_KEY: 'dummy', SESSION_SECRET: 'dummy', XATA_API_KEY: 'dummy' } }
+      return { env: { ...context.env, DB_URL: context.env.CI_DB_URL } }
     }
     const env = AppEnvSchema.parse(context.env)
     return { env }

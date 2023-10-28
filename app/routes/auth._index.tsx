@@ -38,7 +38,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       )
     }
 
-    const data = await signin(result.data, context.env.XATA_API_KEY)
+    const data = await signin(result.data, context.env.XATA_API_KEY, context.env.DB_URL)
     if (data.error) {
       return json(data, { status: 400 })
     }
@@ -57,7 +57,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
       return json({ fields, errors: { ...result.error.flatten().fieldErrors, form: '' } }, { status: 400 })
     }
 
-    const data = await signup(result.data, context.env.XATA_API_KEY)
+    const data = await signup(result.data, context.env.XATA_API_KEY, context.env.DB_URL)
 
     if (data.error) {
       return json(data, { status: 400 })

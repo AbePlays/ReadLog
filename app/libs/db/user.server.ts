@@ -3,8 +3,8 @@ import { z } from 'zod'
 
 import { getXataClient } from './xata'
 
-export async function signin(fields: { email: string; password: string }, key: string) {
-  const xata = getXataClient(key)
+export async function signin(fields: { email: string; password: string }, key: string, dbUrl: string) {
+  const xata = getXataClient(key, dbUrl)
 
   try {
     const user = await xata.db.users.filter({ email: fields.email }).getFirst()
@@ -52,8 +52,12 @@ export async function signin(fields: { email: string; password: string }, key: s
   }
 }
 
-export async function signup(fields: { email: string; fullname: string; password: string }, key: string) {
-  const xata = getXataClient(key)
+export async function signup(
+  fields: { email: string; fullname: string; password: string },
+  key: string,
+  dbUrl: string
+) {
+  const xata = getXataClient(key, dbUrl)
 
   try {
     const pw_hash = await bcrypt.hash(fields.password, 10)

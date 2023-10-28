@@ -23,7 +23,7 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 }
 
 export async function loader({ context, params, request }: LoaderFunctionArgs) {
-  const xata = getXataClient(context.env.XATA_API_KEY)
+  const xata = getXataClient(context.env.XATA_API_KEY, context.env.DB_URL)
   const userId = await getUserId(request, context.env.SESSION_SECRET)
 
   const bookId = z.string().parse(params.bookId)
@@ -66,7 +66,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     return json({ success: false, error: 'Invalid request. Please check your input and try again.' }, { status: 400 })
   }
 
-  const xata = getXataClient(context.env.XATA_API_KEY)
+  const xata = getXataClient(context.env.XATA_API_KEY, context.env.DB_URL)
   if (result.data.userBookId) {
     let record = await xata.db.user_books.filter({ id: result.data.userBookId, user_id: userId }).getFirst()
 
