@@ -24,6 +24,7 @@ if (process.env.NODE_ENV === 'development') {
 export const onRequest = createPagesFunctionHandler({
   build,
   getLoadContext: (context) => {
+    console.log({ ...context.env })
     if (context.env.CI) {
       return { env: { ...context.env, DB_URL: context.env.CI_DB_URL } }
     }

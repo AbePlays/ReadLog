@@ -32,6 +32,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
   )
   const data = await response.json()
   const bookDetails = BookDetailSchema.parse(data)
+  console.log(data, context.env)
 
   let userBook = null
   if (userId) {

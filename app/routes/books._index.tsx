@@ -18,6 +18,7 @@ export async function loader({ context }: LoaderFunctionArgs) {
     `https://www.googleapis.com/books/v1/volumes?q=subject:'fiction','nonfiction','mystery','science','fantasy'&orderBy=relevance&key=${context.env.GOOGLE_BOOKS_API_KEY}`
   )
   const data = await res.json()
+  console.log(data, context.env)
   const books = BooksSchema.parse(data)
   return books
 }
