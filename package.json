@@ -8,7 +8,7 @@
     "check-format": "biome format ./app",
     "check-types": "tsc",
     "dev": "remix dev --manual -c \"pnpm start\"",
-    "dev:test": "remix dev --manual -c \"pnpm start --binding CI=\"true\"\"",
+    "dev:test": "remix dev --manual -c \"pnpm start --binding $(cat .env)\"",
     "format": "biome format --write ./app",
     "lint": "biome check ./app",
     "pages:deploy": "pnpm run build && wrangler pages deploy ./public",
