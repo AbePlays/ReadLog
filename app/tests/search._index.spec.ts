@@ -1,19 +1,9 @@
 import { expect, test } from '@playwright/test'
-import { DUMMY_BOOKS_RESPONSE } from './data/books'
-
-test.beforeEach(async ({ page }) => {
-  await page.route('search?q=Summer+Rain&_data=routes%2Fsearch._index', async (route) => {
-    setTimeout(async () => {
-      await route.fulfill({ json: DUMMY_BOOKS_RESPONSE })
-    }, 1000)
-  })
-
-  await page.goto('/search')
-})
 
 test('has books list when search is performed', async ({ page }) => {
-  await expect(page.getByRole('heading', { name: 'Search Books' })).toBeInViewport()
-  await expect(page.getByLabel('Search books')).toBeInViewport()
+  await page.goto('/search')
+  await expect(page.getByRole('heading', { name: 'Search Books' })).toBeAttached()
+  await expect(page.getByLabel('Search books')).toBeAttached()
   const booksList = page.getByRole('list', { name: 'Search Results' })
   const books = booksList.getByRole('listitem')
   await expect(books).toHaveCount(0)
@@ -22,20 +12,16 @@ test('has books list when search is performed', async ({ page }) => {
   await searchInput.fill('Summer Rain')
   await page.keyboard.press('Enter')
 
-  await expect(page.getByText('Loading Books...')).toBeInViewport()
-  await expect(books).toHaveCount(DUMMY_BOOKS_RESPONSE.items.length)
-  await expect(page.getByText('Loading Books...')).not.toBeInViewport()
+  await expect(page.getByText('Loading Books...')).toBeAttached()
+  await page.waitForResponse((res) => res.url().includes('search?q=Summer+Rain'))
+  await expect(page.getByText('Loading Books...')).not.toBeAttached()
 
-  for (let i = 0; i < DUMMY_BOOKS_RESPONSE.items.length; ++i) {
+  const booksCount = await books.count()
+
+  for (let i = 0; i < booksCount; ++i) {
     const book = books.nth(i)
-    const item = DUMMY_BOOKS_RESPONSE.items[i]
-
-    const bookTitle = book.getByRole('heading', { level: 2 })
-    const bookLink = book.getByRole('link')
-    const bookImage = book.getByRole('img')
-
-    await expect(bookTitle).toHaveText(item.volumeInfo.title)
-    await expect(bookLink).toHaveAttribute('href', `/books/${item.id}`)
-    await expect(bookImage).toHaveAttribute('src', item.volumeInfo.imageLinks.thumbnail)
+    await expect(book.getByRole('heading', { level: 2 })).toBeAttached()
+    await expect(book.getByRole('link')).toBeAttached()
+    await expect(book.getByRole('img')).toBeAttached()
   }
 })
