@@ -8,6 +8,7 @@
     "check-format": "biome format ./app",
     "check-types": "tsc",
     "dev": "remix dev --manual -c \"pnpm start\"",
+    "dev:test": "remix dev --manual -c \"pnpm start --binding CI=\"true\"\"",
     "format": "biome format --write ./app",
     "lint": "biome check ./app",
     "pages:deploy": "pnpm run build && wrangler pages deploy ./public",
@@ -31,6 +32,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.2.2",
     "@cloudflare/workers-types": "^4.20231016.0",
+    "@faker-js/faker": "^8.2.0",
     "@playwright/test": "^1.39.0",
     "@remix-run/dev": "^2.1.0",
     "@types/bcryptjs": "^2.4.5",
