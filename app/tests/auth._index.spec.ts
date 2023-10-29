@@ -5,7 +5,7 @@ const fullName = faker.person.fullName()
 const email = faker.internet.email({ firstName: fullName.split(' ')[0], lastName: fullName.split(' ')[1] })
 const password = faker.internet.password()
 
-test.describe('Testing sign up feature', () => {
+test.describe('Testing sign up error handling', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/auth')
     await page.getByLabel('Sign Up').check()
@@ -54,31 +54,9 @@ test.describe('Testing sign up feature', () => {
     await expect(passwordError).toBeAttached()
     await expect(passwordError).toContainText("Passwords don't match")
   })
-
-  test('redirects to / when sign up is successful', async ({ page }) => {
-    const form = page.getByRole('form', { name: 'sign up form' })
-    await expect(form).toBeAttached()
-
-    const fullnameInput = form.getByLabel('Fullname')
-    await fullnameInput.fill(fullName)
-
-    const emailInput = form.getByLabel('Email')
-    await emailInput.fill(email)
-
-    const passwordInput = form.getByLabel('Password', { exact: true })
-    await passwordInput.fill(password)
-
-    const confirmPasswordInput = form.getByLabel('Confirm Password')
-    await confirmPasswordInput.fill(password)
-
-    const submitButton = form.getByRole('button', { name: 'Submit' })
-    await submitButton.click()
-
-    await page.waitForURL('/')
-  })
 })
 
-test.describe('Testing sign in feature', () => {
+test.describe('Testing sign in error handling', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/auth')
   })
@@ -120,20 +98,53 @@ test.describe('Testing sign in feature', () => {
     await expect(formError).toBeAttached()
     await expect(formError).toContainText('Email/Password combination is incorrect')
   })
+})
 
-  test('redirects to / when sign in is successful', async ({ page }) => {
-    const form = page.getByRole('form', { name: 'sign in form' })
-    await expect(form).toBeAttached()
+test('signs up, signs out and signs back in', async ({ page }) => {
+  await page.goto('/auth')
+  await page.getByLabel('Sign Up').check()
 
-    const emailInput = form.getByLabel('Email')
-    await emailInput.fill('test@user.com')
+  // Sign up
+  let form = page.getByRole('form', { name: 'sign up form' })
+  await expect(form).toBeAttached()
 
-    const passwordInput = form.getByLabel('Password')
-    await passwordInput.fill('testuser@123')
+  const fullnameInput = form.getByLabel('Fullname')
+  await fullnameInput.fill(fullName)
 
-    const submitButton = form.getByRole('button', { name: 'Submit' })
-    await submitButton.click()
+  let emailInput = form.getByLabel('Email')
+  await emailInput.fill(email)
 
-    await page.waitForURL('/')
-  })
+  let passwordInput = form.getByLabel('Password', { exact: true })
+  await passwordInput.fill(password)
+
+  const confirmPasswordInput = form.getByLabel('Confirm Password')
+  await confirmPasswordInput.fill(password)
+
+  let submitButton = form.getByRole('button', { name: 'Submit' })
+  await submitButton.click()
+
+  await page.waitForURL('/')
+
+  // Sign out
+  await page.goto('/auth')
+  form = page.getByRole('form', { name: 'sign out form' })
+  submitButton = form.getByRole('button', { name: 'Logout' })
+  await submitButton.click()
+
+  await page.waitForURL('/auth')
+
+  // Sign in
+  form = page.getByRole('form', { name: 'sign in form' })
+  await expect(form).toBeAttached()
+
+  emailInput = form.getByLabel('Email')
+  await emailInput.fill(email)
+
+  passwordInput = form.getByLabel('Password')
+  await passwordInput.fill(password)
+
+  submitButton = form.getByRole('button', { name: 'Submit' })
+  await submitButton.click()
+
+  await page.waitForURL('/')
 })

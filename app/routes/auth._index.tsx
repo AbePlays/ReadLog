@@ -92,7 +92,7 @@ export default function AuthRoute() {
       {loaderData.userId ? (
         <div>
           <span>You're logged in</span>
-          <Form action="/signout" method="post">
+          <Form action="/signout" aria-label="sign out form" method="post">
             <button type="submit">Logout</button>
           </Form>
         </div>
