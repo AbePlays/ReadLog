@@ -1,10 +1,11 @@
+import type { AppLoadContext } from '@remix-run/cloudflare'
 import bcrypt from 'bcryptjs'
 import { z } from 'zod'
 
-import { getXataClient } from './xata'
+import { getDbClient } from './index.server'
 
-export async function signin(fields: { email: string; password: string }, key: string, dbUrl: string) {
-  const xata = getXataClient(key, dbUrl)
+export async function signin(fields: { email: string; password: string }, context: AppLoadContext) {
+  const xata = getDbClient(context)
 
   try {
     const user = await xata.db.users.filter({ email: fields.email }).getFirst()
@@ -52,12 +53,8 @@ export async function signin(fields: { email: string; password: string }, key: s
   }
 }
 
-export async function signup(
-  fields: { email: string; fullname: string; password: string },
-  key: string,
-  dbUrl: string
-) {
-  const xata = getXataClient(key, dbUrl)
+export async function signup(fields: { email: string; fullname: string; password: string }, context: AppLoadContext) {
+  const xata = getDbClient(context)
 
   try {
     const pw_hash = await bcrypt.hash(fields.password, 10)

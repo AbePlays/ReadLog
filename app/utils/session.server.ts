@@ -1,7 +1,7 @@
-import { createCookieSessionStorage } from '@remix-run/cloudflare'
+import { type AppLoadContext, createCookieSessionStorage } from '@remix-run/cloudflare'
 import { z } from 'zod'
 
-export function getUserSessionStorage(secret: string) {
+export function getUserSessionStorage(context: AppLoadContext) {
   return createCookieSessionStorage({
     cookie: {
       httpOnly: true,
@@ -9,14 +9,14 @@ export function getUserSessionStorage(secret: string) {
       name: 'READLOG_SESSION',
       path: '/',
       sameSite: 'lax',
-      secrets: [secret],
-      secure: true
+      secrets: [context.env.SESSION_SECRET],
+      secure: context.env.CI !== 'true'
     }
   })
 }
 
-export async function getUserId(request: Request, secret: string) {
-  const { getSession } = getUserSessionStorage(secret)
+export async function getUserId(request: Request, context: AppLoadContext) {
+  const { getSession } = getUserSessionStorage(context)
 
   const session = await getSession(request.headers.get('cookie'))
   return z.string().optional().parse(session.get('userId'))

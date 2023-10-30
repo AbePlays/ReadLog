@@ -4,7 +4,7 @@ import { useEffect, useRef } from 'react'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
-import { getXataClient } from '~/libs/db/xata'
+import { getDbClient } from '~/libs/db/index.server'
 import { BookDetailSchema } from '~/schemas/bookSchema'
 import { formatTime } from '~/utils/formatTime'
 import { getUserId } from '~/utils/session.server'
@@ -23,8 +23,8 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
 }
 
 export async function loader({ context, params, request }: LoaderFunctionArgs) {
-  const xata = getXataClient(context.env.XATA_API_KEY, context.env.DB_URL)
-  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  const xata = getDbClient(context)
+  const userId = await getUserId(request, context)
 
   const bookId = z.string().parse(params.bookId)
   const response = await fetch(
@@ -42,7 +42,7 @@ export async function loader({ context, params, request }: LoaderFunctionArgs) {
 }
 
 export async function action({ context, request }: ActionFunctionArgs) {
-  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  const userId = await getUserId(request, context)
 
   if (!userId) {
     return json(
@@ -66,7 +66,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     return json({ success: false, error: 'Invalid request. Please check your input and try again.' }, { status: 400 })
   }
 
-  const xata = getXataClient(context.env.XATA_API_KEY, context.env.DB_URL)
+  const xata = getDbClient(context)
   if (result.data.userBookId) {
     let record = await xata.db.user_books.filter({ id: result.data.userBookId, user_id: userId }).getFirst()
 

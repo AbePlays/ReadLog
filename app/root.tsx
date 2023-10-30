@@ -18,7 +18,7 @@ import { getUserId } from './utils/session.server'
 export const links: LinksFunction = () => [{ rel: 'stylesheet', href: tailwind }]
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  const userId = await getUserId(request, context)
   return { userId }
 }
 

@@ -6,7 +6,7 @@ export async function loader() {
 }
 
 export async function action({ context, request }: ActionFunctionArgs) {
-  const { destroySession, getSession } = getUserSessionStorage(context.env.SESSION_SECRET)
+  const { destroySession, getSession } = getUserSessionStorage(context)
   const session = await getSession(request.headers.get('cookie'))
 
   return redirect('/auth', {
