@@ -10,7 +10,7 @@ export function getUserSessionStorage(context: AppLoadContext) {
       path: '/',
       sameSite: 'lax',
       secrets: [context.env.SESSION_SECRET],
-      secure: context.env.CI !== 'true'
+      secure: context.env.NODE_ENV === 'production'
     }
   })
 }
