@@ -7,6 +7,10 @@ let instance: XataClient | undefined = undefined
 export function getDbClient(context: AppLoadContext) {
   if (instance) return instance
 
-  instance = new XataClient({ apiKey: context.env.XATA_API_KEY, databaseURL: context.env.DB_URL })
+  instance = new XataClient({
+    apiKey: context.env.XATA_API_KEY,
+    databaseURL: context.env.CI === 'true' ? context.env.CI_DB_URL : context.env.DB_URL
+  })
+
   return instance
 }

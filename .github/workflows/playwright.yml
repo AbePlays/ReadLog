@@ -32,23 +32,14 @@ jobs:
       - name: Create env file for server
         run: |
           touch .dev.vars
+          echo CI_DB_URL=${{ secrets.CI_DB_URL }} >> .dev.vars
+          echo CI=${{ secrets.CI }} >> .dev.vars
           echo DB_URL=${{ secrets.DB_URL }} >> .dev.vars
           echo GOOGLE_BOOKS_API_KEY=${{ secrets.GOOGLE_BOOKS_API_KEY }} >> .dev.vars
-          echo NODE_ENV=${{ secrets.NODE_ENV }} >> .dev.vars
           echo SESSION_SECRET=${{ secrets.SESSION_SECRET }} >> .dev.vars
           echo XATA_API_KEY=${{ secrets.XATA_API_KEY }} >> .dev.vars
           cat .dev.vars
-
-      - name: Create env file for playwright
-        run: |
-          touch .env
-          echo DB_URL=${{ secrets.DB_URL }} >> .env
-          echo GOOGLE_BOOKS_API_KEY=${{ secrets.GOOGLE_BOOKS_API_KEY }} >> .env
-          echo NODE_ENV=${{ secrets.NODE_ENV }} >> .env
-          echo SESSION_SECRET=${{ secrets.SESSION_SECRET }} >> .env
-          echo XATA_API_KEY=${{ secrets.XATA_API_KEY }} >> .env
-          cat .env
-
+          
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 

@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker'
 import { test as base } from '@playwright/test'
 import bcrypt from 'bcryptjs'
 import { parse } from 'cookie'
+import { readFile } from 'fs/promises'
 import type { z } from 'zod'
 
 import { getDbClient } from '~/libs/db/index.server'
@@ -13,8 +14,34 @@ const fullname = faker.person.fullName()
 const email = faker.internet.email({ firstName: fullname.split(' ')[0], lastName: fullname.split(' ')[1] })
 const password = faker.internet.password()
 
-function getContext() {
-  const env = AppEnvSchema.parse(process.env)
+function parseDevVars(content: string) {
+  const lines = content.split('\n')
+  const result: Record<string, string> = {}
+
+  for (const line of lines) {
+    const parts = line.split('=')
+    if (parts.length === 2) {
+      const key = parts[0].trim()
+      const value = parts[1].trim()
+      result[key] = value
+    }
+  }
+
+  return result
+}
+
+async function getContext() {
+  const filePath = '.dev.vars'
+  let data = ''
+
+  try {
+    data = await readFile(filePath, 'utf8')
+  } catch (error) {
+    console.error(`Error reading file: ${error}`)
+  }
+
+  const parsedData = parseDevVars(data)
+  const env = AppEnvSchema.parse(parsedData)
   return { env }
 }
 
@@ -31,7 +58,7 @@ export async function insertNewUser(context: { env: z.infer<typeof AppEnvSchema>
 export const test = base.extend<{ login: () => Promise<void> }>({
   login: async ({ baseURL, page }, use) => {
     return use(async () => {
-      const context = getContext()
+      const context = await getContext()
       const { commitSession, getSession } = getUserSessionStorage(context)
 
       const user = await insertNewUser(context)
@@ -46,7 +73,7 @@ export const test = base.extend<{ login: () => Promise<void> }>({
           httpOnly: true,
           name: 'READLOG_SESSION',
           sameSite: 'Lax',
-          secure: context.env.NODE_ENV === 'production',
+          secure: context.env.CI === 'false',
           url: baseURL,
           value: READLOG_SESSION
         }
@@ -56,7 +83,7 @@ export const test = base.extend<{ login: () => Promise<void> }>({
 })
 
 test.afterEach(async () => {
-  const context = getContext()
+  const context = await getContext()
   const xata = getDbClient(context)
   await xata.db.users.delete([...users].map((user) => user.id))
 })
