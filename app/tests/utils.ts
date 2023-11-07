@@ -85,6 +85,12 @@ export const test = base.extend<{ login: () => Promise<void> }>({
 test.afterEach(async () => {
   const context = await getContext()
   const xata = getDbClient(context)
+  for (const user of users) {
+    const records = await xata.db.user_books.filter({ user_id: user.id }).getAll()
+    for (const record of records) {
+      await xata.db.user_books.delete(record.id)
+    }
+  }
   await xata.db.users.delete([...users].map((user) => user.id))
 })
 
