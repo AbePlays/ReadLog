@@ -1,7 +1,7 @@
 import { type LoaderFunctionArgs, type MetaFunction, redirect } from '@remix-run/cloudflare'
 import { Link, useLoaderData } from '@remix-run/react'
 
-import { getXataClient } from '~/libs/db/xata'
+import { getDbClient } from '~/libs/db/index.server'
 import { getUserId } from '~/utils/session.server'
 
 export const meta: MetaFunction = () => {
@@ -9,12 +9,12 @@ export const meta: MetaFunction = () => {
 }
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const userId = await getUserId(request, context.env.SESSION_SECRET)
+  const userId = await getUserId(request, context)
   if (!userId) {
     return redirect('/auth')
   }
 
-  const xata = getXataClient(context.env.XATA_API_KEY)
+  const xata = getDbClient(context)
   const books = await xata.db.user_books.filter({ user_id: userId }).getAll()
 
   return books

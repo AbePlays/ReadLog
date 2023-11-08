@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [18.x]
+        node-version: [20.x]
     
     steps:
       - uses: actions/checkout@v3
@@ -29,6 +29,17 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      - name: Create env file for server
+        run: |
+          touch .dev.vars
+          echo CI_DB_URL=${{ secrets.CI_DB_URL }} >> .dev.vars
+          echo CI=${{ secrets.CI }} >> .dev.vars
+          echo DB_URL=${{ secrets.DB_URL }} >> .dev.vars
+          echo GOOGLE_BOOKS_API_KEY=${{ secrets.GOOGLE_BOOKS_API_KEY }} >> .dev.vars
+          echo SESSION_SECRET=${{ secrets.SESSION_SECRET }} >> .dev.vars
+          echo XATA_API_KEY=${{ secrets.XATA_API_KEY }} >> .dev.vars
+          cat .dev.vars
+          
       - name: Install Playwright Browsers
         run: pnpm exec playwright install --with-deps
 

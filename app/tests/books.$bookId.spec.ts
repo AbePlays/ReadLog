@@ -1,33 +1,54 @@
-import { expect, test } from '@playwright/test'
-
-import { DUMMY_BOOKS_RESPONSE, DUMMY_BOOK_RESPONSE } from './data/books'
-
-test.beforeEach(async ({ page }) => {
-  await page.route('books?_data=routes%2Fbooks._index', async (route) => {
-    await route.fulfill({ json: DUMMY_BOOKS_RESPONSE })
-  })
-
-  await page.route(`/books/${DUMMY_BOOK_RESPONSE.id}?_data=routes%2Fbooks.%24bookId`, async (route) => {
-    await route.fulfill({ json: { bookDetails: DUMMY_BOOK_RESPONSE, userDetails: { userBook: null, userId: null } } })
-  })
-
-  await page.goto('/')
-  const booksLink = page.getByRole('link', { name: 'Checkout Popular Books' })
-  await booksLink.click()
-
-  const booksList = page.getByRole('list', { name: 'Popular Books' })
-  const books = booksList.getByRole('listitem')
-  await expect(books).toHaveCount(DUMMY_BOOKS_RESPONSE.items.length)
-  const bookLink = books.nth(0).getByRole('link')
-  await bookLink.click()
-})
+import { expect, test } from './utils'
 
 test('has a link back to books route', async ({ page }) => {
+  await page.goto('/books/z-h8EAAAQBAJ')
   const booksLink = page.getByRole('link', { name: 'Back to Books' })
   await expect(booksLink).toHaveAttribute('href', '/books')
 })
 
-test('has book title and description', async ({ page }) => {
-  await expect(page.getByRole('heading', { name: `${DUMMY_BOOK_RESPONSE.volumeInfo.title}` })).toBeInViewport()
-  await expect(page.getByRole('paragraph').first()).toHaveText(DUMMY_BOOK_RESPONSE.volumeInfo.description)
+test('has book details on the page', async ({ page }) => {
+  await page.goto('/books/z-h8EAAAQBAJ')
+  await expect(page.getByRole('img')).toBeAttached()
+  await expect(page.getByRole('heading', { level: 1 })).toBeAttached()
+  await expect(page.getByText('Number of Pages')).toBeAttached()
+  await expect(page.getByRole('paragraph').first()).toBeAttached()
+})
+
+test('has book details on the page for logged in user', async ({ login, page }) => {
+  await login()
+  await page.goto('/library')
+
+  let booksList = page.getByRole('list', { name: 'Your ReadLog Library' })
+  let books = booksList.getByRole('listitem')
+  expect(await books.count()).toBe(0)
+
+  await page.goto('/books')
+  booksList = page.getByRole('list', { name: 'Popular Books' })
+  books = booksList.getByRole('listitem')
+  await books.first().click()
+
+  // Check cancel functionality
+  await page.getByText('Start Reading').click()
+  await page.waitForTimeout(2000)
+  await page.getByText('00:02').click()
+  page.getByText('Update Reading Progress')
+
+  await page.getByLabel('Page Number').fill('10')
+  await page.getByRole('button', { name: 'Cancel' }).click()
+
+  // Check submit functionality
+  await page.getByText('Start Reading').click()
+  await page.waitForTimeout(2000)
+  await page.getByText('00:02').click()
+  page.getByText('Update Reading Progress')
+
+  await page.getByLabel('Page Number').fill('10')
+  await page.getByRole('button', { name: 'Submit' }).click()
+
+  await page.waitForResponse((res) => res.url().includes('books'))
+
+  await page.goto('/library')
+  booksList = page.getByRole('list', { name: 'Your ReadLog Library' })
+  books = booksList.getByRole('listitem')
+  expect(await books.count()).toBe(1)
 })
