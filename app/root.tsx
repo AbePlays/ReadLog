@@ -15,7 +15,10 @@ import {
 import tailwind from '~/styles/tailwind.css'
 import { getUserId } from './utils/session.server'
 
-export const links: LinksFunction = () => [{ rel: 'stylesheet', href: tailwind }]
+export const links: LinksFunction = () => [
+  { rel: 'manifest', href: '/site.webmanifest' },
+  { rel: 'stylesheet', href: tailwind }
+]
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   const userId = await getUserId(request, context)
