@@ -22,9 +22,11 @@
     "@remix-run/react": "^2.2.0",
     "@xata.io/client": "^0.26.9",
     "bcryptjs": "^2.4.3",
+    "clsx": "^2.0.0",
     "isbot": "^3.7.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "tailwind-merge": "^2.0.0",
     "use-timer": "^2.0.1",
     "zod": "^3.22.4"
   },
