@@ -1,8 +1,8 @@
-import { Link } from '@remix-run/react';
-import type { TBook } from '~/schemas/bookSchema';
+import { Link } from '@remix-run/react'
+import type { TBook } from '~/schemas/bookSchema'
 
 export default function BookCover(props: { book: TBook }) {
-  const { book } = props;
+  const { book } = props
 
   return (
     <div className="h-full">
@@ -10,9 +10,7 @@ export default function BookCover(props: { book: TBook }) {
         <div
           className="absolute inset-0 bg-cover blur-lg scale-150 origin-bottom"
           style={{
-            backgroundImage: `url(${
-              book.volumeInfo.imageLinks?.thumbnail ?? '/placeholder.png'
-            })`,
+            backgroundImage: `url(${book.volumeInfo.imageLinks?.thumbnail ?? '/placeholder.png'})`
           }}
         />
         <img
@@ -24,13 +22,9 @@ export default function BookCover(props: { book: TBook }) {
         />
       </div>
       <div className="mt-4">
-        <span className="text-gray-600 text-sm line-clamp-1">
-          {book.volumeInfo.authors?.join(', ')}
-        </span>
-        <h2 className="font-semibold mt-1 line-clamp-2">
-          {book.volumeInfo.title}
-        </h2>
+        <span className="text-gray-600 text-sm line-clamp-1">{book.volumeInfo.authors?.join(', ')}</span>
+        <h2 className="font-semibold mt-1 line-clamp-2">{book.volumeInfo.title}</h2>
       </div>
     </div>
-  );
+  )
 }
