@@ -1,50 +1,43 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare';
-import {
-  Form,
-  Link,
-  useLoaderData,
-  useNavigation,
-  useSearchParams,
-} from '@remix-run/react';
+import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
+import { Form, Link, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
-import BookCover from '~/components/BookCover';
-import { BookSearchSchema } from '~/schemas/bookSchema';
-import { cn } from '~/utils/cn';
+import BookCover from '~/components/BookCover'
+import { BookSearchSchema } from '~/schemas/bookSchema'
+import { cn } from '~/utils/cn'
 
 export const meta: MetaFunction = () => {
   return [
     { title: 'Book Search - ReadLog' },
     {
       name: 'description',
-      content:
-        'Search for books, discover new titles, and find your favorite reads online',
-    },
-  ];
-};
+      content: 'Search for books, discover new titles, and find your favorite reads online'
+    }
+  ]
+}
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
-  const url = new URL(request.url);
-  const query = url.searchParams.get('q');
+  const url = new URL(request.url)
+  const query = url.searchParams.get('q')
 
   if (query) {
     const response = await fetch(
       `https://www.googleapis.com/books/v1/volumes?q=intitle:${query}&key=${context.env.GOOGLE_BOOKS_API_KEY}`
-    );
-    const data = await response.json();
-    const books = BookSearchSchema.parse(data);
-    return books;
+    )
+    const data = await response.json()
+    const books = BookSearchSchema.parse(data)
+    return books
   }
 
-  return null;
+  return null
 }
 
 export default function SearchRoute() {
-  const loaderData = useLoaderData<typeof loader>();
-  const { location, state } = useNavigation();
-  const [searchParams] = useSearchParams();
+  const loaderData = useLoaderData<typeof loader>()
+  const { location, state } = useNavigation()
+  const [searchParams] = useSearchParams()
 
-  const isLoadingBooks = state === 'loading' && location.pathname === '/search';
-  const query = searchParams.get('q') ?? '';
+  const isLoadingBooks = state === 'loading' && location.pathname === '/search'
+  const query = searchParams.get('q') ?? ''
 
   return (
     <div>
@@ -62,12 +55,9 @@ export default function SearchRoute() {
       {isLoadingBooks ? <span>Loading Books...</span> : null}
       <ul
         aria-label="Search Results"
-        className={cn(
-          'grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6',
-          {
-            'pointer-events-none opacity-30': isLoadingBooks,
-          }
-        )}
+        className={cn('grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6', {
+          'pointer-events-none opacity-30': isLoadingBooks
+        })}
       >
         {loaderData?.items?.map((book) => {
           return (
@@ -76,9 +66,9 @@ export default function SearchRoute() {
                 <BookCover book={book} />
               </Link>
             </li>
-          );
+          )
         })}
       </ul>
     </div>
-  );
+  )
 }
