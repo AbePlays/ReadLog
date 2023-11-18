@@ -36,3 +36,5 @@ export const BookSearchSchema = z.object({
   totalItems: z.number(),
   items: z.array(BookSchema)
 })
+
+export type TBook = z.infer<typeof BookSchema>
