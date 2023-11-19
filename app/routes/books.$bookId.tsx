@@ -1,9 +1,12 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
-import { Form, Link, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
+import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
+import { BookText } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
+import BackButton from '~/components/BackButton'
+import ClientOnly from '~/components/ClientOnly'
 import { getDbClient } from '~/libs/db/index.server'
 import { BookDetailSchema } from '~/schemas/bookSchema'
 import { formatTime } from '~/utils/formatTime'
@@ -156,28 +159,69 @@ export default function BookRoute() {
   }
 
   return (
-    <div>
-      <Link to="/books">Back to Books</Link>
-      <img
-        alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}
-        height="450px"
-        src={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail}
-        width="300px"
-      />
-      <h1 className="font-bold">{loaderData.bookDetails.volumeInfo.title}</h1>
+    <>
+      <div className="flex justify-between items-start">
+        <BackButton className="mt-8 ml-4" />
+        <div className="p-8 bg-gray-100">
+          <img
+            alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}
+            className="aspect-[2/3] shadow"
+            height="300"
+            src={loaderData.bookDetails.volumeInfo.imageLinks?.thumbnail}
+            width="200"
+          />
+        </div>
+      </div>
+      <div className="grid gap-2 mt-4 p-4">
+        <h1 className="font-medium text-lg">{loaderData.bookDetails.volumeInfo.title}</h1>
+        <span className="block text-sm text-gray-600">{loaderData.bookDetails.volumeInfo.authors?.join(', ')}</span>
+        {loaderData.bookDetails.volumeInfo.pageCount ? (
+          <span className="text-sm flex gap-2 text-gray-600 leading-none">
+            <BookText aria-hidden="true" size={14} />
+            {loaderData.bookDetails.volumeInfo.pageCount} Pages
+          </span>
+        ) : null}
 
-      {loaderData.userDetails.userId ? (
-        <>
-          {hasNotRead ? null : <span>You have completed {completionPercentage.toFixed(2)}% of the book</span>}
-          <button className="block" onClick={handleTimer} type="button">
-            {hasTimerStarted
-              ? formatTime(time)
-              : hasNotRead
-              ? 'Start Reading'
-              : `Continue Reading from Page ${currentPageNumber}`}
-          </button>
-        </>
-      ) : null}
+        {loaderData.userDetails.userId ? (
+          <>
+            <div
+              className="mt-2 bg-gray-200 rounded-lg overflow-hidden h-2 relative before:absolute before:inset-0 before:bg-black before:transition-[width] before:w-[--progress-width]"
+              style={{ '--progress-width': `${completionPercentage}%` } as React.CSSProperties}
+            >
+              <label className="sr-only" htmlFor="reading-progress">
+                Reading progress
+              </label>
+              <progress className="opacity-0" id="reading-progress" max="100" value={completionPercentage}>
+                {completionPercentage}%
+              </progress>
+            </div>
+            <span className="text-right block text-sm text-gray-400">{completionPercentage}% Completed</span>
+
+            <button
+              className="bg-black text-white rounded-lg text-sm tabular-nums font-medium p-2"
+              onClick={handleTimer}
+              type="button"
+            >
+              {hasTimerStarted
+                ? formatTime(time)
+                : hasNotRead
+                ? 'Start Reading'
+                : `Continue on Page ${currentPageNumber}`}
+            </button>
+          </>
+        ) : null}
+
+        <hr className="mt-4 b-0 h-0.5 bg-gray-200 rounded-full" />
+
+        <ClientOnly>
+          <span className="mt-2 font-medium">Synopsis</span>
+          <p
+            className="text-gray-600 text-sm prose"
+            // biome-ignore lint/security/noDangerouslySetInnerHtml: santized by google books
+            dangerouslySetInnerHTML={{ __html: loaderData.bookDetails.volumeInfo.description ?? '' }}
+          />
+        </ClientOnly>
+      </div>
 
       <dialog className="p-4" ref={dialogRef}>
         <h2 className="font-bold">Update Reading Progress</h2>
@@ -207,9 +251,6 @@ export default function BookRoute() {
           </fieldset>
         </Form>
       </dialog>
-
-      <span className="block">Number of Pages: {loaderData.bookDetails.volumeInfo.pageCount}</span>
-      <p>{loaderData.bookDetails.volumeInfo.description}</p>
-    </div>
+    </>
   )
 }
