@@ -1,6 +1,6 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
-import { BookText } from 'lucide-react'
+import { BookText, PenBox } from 'lucide-react'
 import { useEffect, useRef } from 'react'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
@@ -159,7 +159,7 @@ export default function BookRoute() {
   }
 
   return (
-    <>
+    <div className="max-w-screen-sm mx-auto">
       <div className="flex justify-between items-start">
         <BackButton className="mt-8 ml-4" />
         <div className="p-8 bg-gray-100">
@@ -175,10 +175,23 @@ export default function BookRoute() {
       <div className="grid gap-2 mt-4 p-4">
         <h1 className="font-medium text-lg">{loaderData.bookDetails.volumeInfo.title}</h1>
         <span className="block text-sm text-gray-600">{loaderData.bookDetails.volumeInfo.authors?.join(', ')}</span>
+
+        {loaderData.bookDetails.volumeInfo.publishedDate ? (
+          <span className="text-sm flex gap-2 text-gray-600 leading-none">
+            <PenBox aria-hidden="true" size={14} />
+            <span>
+              <time dateTime={loaderData.bookDetails.volumeInfo.publishedDate}>
+                {new Intl.DateTimeFormat().format(new Date(loaderData.bookDetails.volumeInfo.publishedDate))}
+              </time>{' '}
+              (First Published)
+            </span>
+          </span>
+        ) : null}
+
         {loaderData.bookDetails.volumeInfo.pageCount ? (
           <span className="text-sm flex gap-2 text-gray-600 leading-none">
             <BookText aria-hidden="true" size={14} />
-            {loaderData.bookDetails.volumeInfo.pageCount} Pages
+            {new Intl.NumberFormat().format(loaderData.bookDetails.volumeInfo.pageCount)} Pages
           </span>
         ) : null}
 
@@ -216,7 +229,7 @@ export default function BookRoute() {
         <ClientOnly>
           <span className="mt-2 font-medium">Synopsis</span>
           <p
-            className="text-gray-600 text-sm prose"
+            className="text-gray-600 text-sm prose max-w-none"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: santized by google books
             dangerouslySetInnerHTML={{ __html: loaderData.bookDetails.volumeInfo.description ?? '' }}
           />
@@ -251,6 +264,6 @@ export default function BookRoute() {
           </fieldset>
         </Form>
       </dialog>
-    </>
+    </div>
   )
 }
