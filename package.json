@@ -17,6 +17,7 @@
     "validate": "pnpm check-types && pnpm check-format && pnpm lint"
   },
   "dependencies": {
+    "@radix-ui/react-dialog": "^1.0.5",
     "@remix-run/cloudflare": "^2.2.0",
     "@remix-run/cloudflare-pages": "^2.2.0",
     "@remix-run/react": "^2.2.0",
