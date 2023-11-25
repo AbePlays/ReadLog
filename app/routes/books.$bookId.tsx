@@ -1,12 +1,13 @@
 import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
 import { BookText, PenBox } from 'lucide-react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useState } from 'react'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
 import BackButton from '~/components/BackButton'
 import ClientOnly from '~/components/ClientOnly'
+import Modal from '~/components/ui/Modal'
 import { getDbClient } from '~/libs/db/index.server'
 import { BookDetailSchema } from '~/schemas/bookSchema'
 import { formatTime } from '~/utils/formatTime'
@@ -133,7 +134,7 @@ export default function BookRoute() {
   const actionData = useActionData<typeof action>()
   const loaderData = useLoaderData<typeof loader>()
   const { state } = useNavigation()
-  const dialogRef = useRef<HTMLDialogElement>(null)
+  const [showModal, setShowModal] = useState(false)
   const { pause, reset, start, status, time } = useTimer()
 
   const hasTimerStarted = status === 'RUNNING'
@@ -144,14 +145,14 @@ export default function BookRoute() {
   useEffect(() => {
     // Close dialog if the form is successfully submitted
     if (actionData?.success) {
-      dialogRef.current?.close()
+      setShowModal(false)
     }
   }, [actionData])
 
   function handleTimer() {
     if (hasTimerStarted) {
       pause()
-      dialogRef.current?.showModal()
+      setShowModal(true)
     } else {
       reset()
       start()
@@ -208,7 +209,9 @@ export default function BookRoute() {
                 {completionPercentage}%
               </progress>
             </div>
-            <span className="text-right block text-sm text-gray-400">{completionPercentage}% Completed</span>
+            <span className="text-right block text-sm text-gray-400">
+              {Math.floor(completionPercentage)}% Completed
+            </span>
 
             <button
               className="bg-black text-white rounded-lg text-sm tabular-nums font-medium p-2"
@@ -236,34 +239,39 @@ export default function BookRoute() {
         </ClientOnly>
       </div>
 
-      <dialog className="p-4" ref={dialogRef}>
-        <h2 className="font-bold">Update Reading Progress</h2>
-        <p>Keep your reading on track! Please enter the page number you've reached in the book. </p>
+      <Modal open={showModal} onOpenChange={setShowModal}>
+        <Modal.Content title="Update Reading Progress" onEscapeKeyDown={(e) => e.preventDefault()}>
+          <div className="p-4">
+            <p>Keep your reading on track! Please enter the page number you've reached in the book.</p>
 
-        <Form method="post">
-          <fieldset disabled={state !== 'idle'}>
-            <input name="bookId" type="hidden" value={loaderData.bookDetails.id} />
-            <input name="bookName" type="hidden" value={loaderData.bookDetails.volumeInfo.title} />
-            <input name="imageUrl" type="hidden" value={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail} />
-            <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id ?? ''} />
-            <input name="timeSpent" readOnly type="hidden" value={time} />
+            <Form method="post">
+              <fieldset disabled={state !== 'idle'}>
+                <input name="bookId" type="hidden" value={loaderData.bookDetails.id} />
+                <input name="bookName" type="hidden" value={loaderData.bookDetails.volumeInfo.title} />
+                <input
+                  name="imageUrl"
+                  type="hidden"
+                  value={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail}
+                />
+                <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id ?? ''} />
+                <input name="timeSpent" readOnly type="hidden" value={time} />
 
-            <label htmlFor="pageNumber">Page Number</label>
-            <input
-              className="block"
-              defaultValue={loaderData.userDetails.userBook?.reading_history[0]?.page_end}
-              id="pageNumber"
-              name="pageNumber"
-              type="number"
-            />
+                <label htmlFor="pageNumber">Page Number</label>
+                <input
+                  className="block"
+                  defaultValue={loaderData.userDetails.userBook?.reading_history[0]?.page_end}
+                  id="pageNumber"
+                  name="pageNumber"
+                  type="number"
+                />
 
-            <button onClick={() => dialogRef.current?.close()} type="button">
-              Cancel
-            </button>
-            <button type="submit">Submit</button>
-          </fieldset>
-        </Form>
-      </dialog>
+                <Modal.Close type="button">Cancel</Modal.Close>
+                <button type="submit">Submit</button>
+              </fieldset>
+            </Form>
+          </div>
+        </Modal.Content>
+      </Modal>
     </div>
   )
 }
