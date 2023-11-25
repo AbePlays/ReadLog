@@ -165,7 +165,7 @@ export default function BookRoute() {
         <div className="p-8 bg-gray-100">
           <img
             alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}
-            className="aspect-[2/3] shadow"
+            className="aspect-[2/3]"
             height="300"
             src={loaderData.bookDetails.volumeInfo.imageLinks?.thumbnail}
             width="200"
@@ -173,11 +173,11 @@ export default function BookRoute() {
         </div>
       </div>
       <div className="grid gap-2 mt-4 p-4">
-        <h1 className="font-medium text-lg">{loaderData.bookDetails.volumeInfo.title}</h1>
-        <span className="block text-sm text-gray-600">{loaderData.bookDetails.volumeInfo.authors?.join(', ')}</span>
+        <h1 className="font-medium text-xl">{loaderData.bookDetails.volumeInfo.title}</h1>
+        <span className="block text-gray-600">{loaderData.bookDetails.volumeInfo.authors?.join(', ')}</span>
 
         {loaderData.bookDetails.volumeInfo.publishedDate ? (
-          <span className="text-sm flex gap-2 text-gray-600 leading-none">
+          <span className="flex text-sm gap-2 text-gray-600 leading-none">
             <PenBox aria-hidden="true" size={14} />
             <span>
               <time dateTime={loaderData.bookDetails.volumeInfo.publishedDate}>
@@ -189,7 +189,7 @@ export default function BookRoute() {
         ) : null}
 
         {loaderData.bookDetails.volumeInfo.pageCount ? (
-          <span className="text-sm flex gap-2 text-gray-600 leading-none">
+          <span className="flex text-sm gap-2 text-gray-600 leading-none">
             <BookText aria-hidden="true" size={14} />
             {new Intl.NumberFormat().format(loaderData.bookDetails.volumeInfo.pageCount)} Pages
           </span>
@@ -227,7 +227,7 @@ export default function BookRoute() {
         <hr className="mt-4 b-0 h-0.5 bg-gray-200 rounded-full" />
 
         <ClientOnly>
-          <span className="mt-2 font-medium">Synopsis</span>
+          <span className="mt-2 font-medium text-lg">Synopsis</span>
           <p
             className="text-gray-600 text-sm prose max-w-none"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: santized by google books
