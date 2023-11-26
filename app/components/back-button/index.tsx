@@ -3,7 +3,7 @@ import { ArrowLeft } from 'lucide-react'
 
 import { cn } from '~/utils/cn'
 
-export default function BackButton(props: React.ComponentProps<'button'>) {
+function BackButton(props: React.ComponentProps<'button'>) {
   const { className, ...rest } = props
   const navigate = useNavigate()
 
@@ -23,3 +23,5 @@ export default function BackButton(props: React.ComponentProps<'button'>) {
     </button>
   )
 }
+
+export { BackButton }

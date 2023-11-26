@@ -7,7 +7,7 @@ import type { z } from 'zod'
 
 import { getDbClient } from '~/libs/db/index.server'
 import type { UsersRecord } from '~/libs/db/xata.server'
-import { AppEnvSchema } from '~/schemas/appEnvSchema'
+import { AppEnvSchema } from '~/schemas/app-env'
 import { getUserSessionStorage } from '~/utils/session.server'
 
 function parseDevVars(content: string) {

@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 import { cn } from '~/utils/cn'
 
-export default function Modal(props: Dialog.DialogProps) {
+function Modal(props: Dialog.DialogProps) {
   return <Dialog.Root {...props} />
 }
 
@@ -35,3 +35,5 @@ function ModalContent({ children, className, title, ...rest }: { title: string }
 Modal.Button = Dialog.Trigger
 Modal.Close = Dialog.Close
 Modal.Content = ModalContent
+
+export { Modal }

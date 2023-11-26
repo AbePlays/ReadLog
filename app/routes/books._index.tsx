@@ -1,8 +1,8 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
 import { Link, useLoaderData } from '@remix-run/react'
 
-import BookCover from '~/components/BookCover'
-import { BooksSchema } from '~/schemas/bookSchema'
+import { BookCover } from '~/components/book-cover'
+import { BooksSchema } from '~/schemas/book'
 
 export const meta: MetaFunction = () => {
   return [
