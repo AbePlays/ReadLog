@@ -6,9 +6,10 @@ import {
   redirect
 } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
+import { Button } from '~/components/ui/button'
 
 import { signin, signup } from '~/libs/db/user.server'
-import { signinSchema, signupSchema } from '~/schemas/authSchema'
+import { signinSchema, signupSchema } from '~/schemas/auth'
 import { getUserId, getUserSessionStorage } from '~/utils/session.server'
 
 export const meta: MetaFunction = () => {
@@ -93,7 +94,9 @@ export default function AuthRoute() {
         <div>
           <span>You're logged in</span>
           <Form action="/signout" aria-label="sign out form" method="post">
-            <button type="submit">Logout</button>
+            <Button type="submit" variant="solid">
+              Logout
+            </Button>
           </Form>
         </div>
       ) : (
@@ -196,9 +199,9 @@ export default function AuthRoute() {
             ) : null}
 
             {actionData?.errors.form ? <p role="alert">{actionData.errors.form}</p> : null}
-            <button disabled={state === 'submitting'} type="submit">
+            <Button disabled={state === 'submitting'} type="submit" variant="solid">
               Submit
-            </button>
+            </Button>
           </fieldset>
         </Form>
       )}

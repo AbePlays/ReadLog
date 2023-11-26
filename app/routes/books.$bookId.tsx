@@ -5,11 +5,12 @@ import { useEffect, useState } from 'react'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
-import BackButton from '~/components/BackButton'
-import ClientOnly from '~/components/ClientOnly'
-import Modal from '~/components/ui/Modal'
+import { BackButton } from '~/components/back-button'
+import { ClientOnly } from '~/components/client-only'
+import { Button } from '~/components/ui/button'
+import { Modal } from '~/components/ui/modal'
 import { getDbClient } from '~/libs/db/index.server'
-import { BookDetailSchema } from '~/schemas/bookSchema'
+import { BookDetailSchema } from '~/schemas/book'
 import { formatTime } from '~/utils/formatTime'
 import { getUserId } from '~/utils/session.server'
 
@@ -181,7 +182,7 @@ export default function BookRoute() {
           <span className="flex text-sm gap-2 text-gray-600 leading-none">
             <PenBox aria-hidden="true" size={14} />
             <span>
-              <time dateTime={loaderData.bookDetails.volumeInfo.publishedDate}>
+              <time dateTime={loaderData.bookDetails.volumeInfo.publishedDate} suppressHydrationWarning>
                 {new Intl.DateTimeFormat().format(new Date(loaderData.bookDetails.volumeInfo.publishedDate))}
               </time>{' '}
               (First Published)
@@ -213,17 +214,13 @@ export default function BookRoute() {
               {Math.floor(completionPercentage)}% Completed
             </span>
 
-            <button
-              className="bg-black text-white rounded-lg text-sm tabular-nums font-medium p-2"
-              onClick={handleTimer}
-              type="button"
-            >
+            <Button className="tabular-nums" onClick={handleTimer} variant="solid">
               {hasTimerStarted
                 ? formatTime(time)
                 : hasNotRead
                 ? 'Start Reading'
                 : `Continue on Page ${currentPageNumber}`}
-            </button>
+            </Button>
           </>
         ) : null}
 
@@ -265,8 +262,14 @@ export default function BookRoute() {
                   type="number"
                 />
 
-                <Modal.Close type="button">Cancel</Modal.Close>
-                <button type="submit">Submit</button>
+                <div className="flex gap-4">
+                  <Modal.Close asChild>
+                    <Button variant="soft">Cancel</Button>
+                  </Modal.Close>
+                  <Button type="submit" variant="solid">
+                    Submit
+                  </Button>
+                </div>
               </fieldset>
             </Form>
           </div>
