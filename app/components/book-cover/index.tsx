@@ -1,7 +1,6 @@
-import { Link } from '@remix-run/react'
-import type { TBook } from '~/schemas/bookSchema'
+import type { TBook } from '~/schemas/book'
 
-export default function BookCover(props: { book: TBook }) {
+function BookCover(props: { book: TBook }) {
   const { book } = props
 
   return (
@@ -28,3 +27,5 @@ export default function BookCover(props: { book: TBook }) {
     </div>
   )
 }
+
+export { BookCover }

@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-import { AppEnvSchema } from '~/schemas/appEnvSchema'
+import { AppEnvSchema } from '~/schemas/app-env'
 
 type Env = z.infer<typeof AppEnvSchema>
 

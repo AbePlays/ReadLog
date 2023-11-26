@@ -1,6 +1,6 @@
 import React from 'react'
 
-export default function ClientOnly({ children }: { children: React.ReactNode }) {
+function ClientOnly({ children }: { children: React.ReactNode }) {
   const [isClient, setIsClient] = React.useState(false)
 
   React.useEffect(() => {
@@ -11,3 +11,5 @@ export default function ClientOnly({ children }: { children: React.ReactNode }) 
 
   return isClient ? children : null
 }
+
+export { ClientOnly }

@@ -3,7 +3,7 @@ import { createPagesFunctionHandler } from '@remix-run/cloudflare-pages'
 import * as build from '@remix-run/dev/server-build'
 import { z } from 'zod'
 
-import { AppEnvSchema } from '~/schemas/appEnvSchema'
+import { AppEnvSchema } from '~/schemas/app-env'
 
 declare module '@remix-run/cloudflare' {
   interface AppLoadContext {
