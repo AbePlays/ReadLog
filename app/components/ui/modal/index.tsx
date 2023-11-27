@@ -10,10 +10,10 @@ function Modal(props: Dialog.DialogProps) {
 function ModalContent({ children, className, title, ...rest }: { title: string } & Dialog.DialogContentProps) {
   return (
     <Dialog.Portal>
-      <Dialog.Overlay className="z-10 fixed inset-0 bg-black/50 backdrop-blur" />
+      <Dialog.Overlay className="z-10 fixed inset-0 bg-black/50 backdrop-blur data-[state=open]:animate-[overlay-show_200ms] data-[state=closed]:animate-[overlay-hide_200ms]" />
       <Dialog.Content
         className={cn(
-          'z-20 fixed sm:left-1/2 sm:top-1/2 w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 bottom-0 sm:bottom-auto rounded-t-md sm:rounded-b-md bg-white shadow max-h-screen overflow-scroll',
+          'z-20 fixed sm:left-1/2 sm:top-1/2 w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 bottom-0 sm:bottom-auto rounded-t-md sm:rounded-b-md bg-white shadow max-h-screen overflow-scroll motion-safe:data-[state=open]:animate-[dialog-show_200ms] motion-safe:data-[state=closed]:animate-[dialog-hide_200ms]',
           className
         )}
         {...rest}
