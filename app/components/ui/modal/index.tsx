@@ -13,12 +13,12 @@ function ModalContent({ children, className, title, ...rest }: { title: string }
       <Dialog.Overlay className="z-10 fixed inset-0 bg-black/50 backdrop-blur" />
       <Dialog.Content
         className={cn(
-          'z-20 fixed left-1/2 top-1/2 w-full max-w-lg -translate-x-1/2 -translate-y-1/2 rounded-md bg-white shadow',
+          'z-20 fixed sm:left-1/2 sm:top-1/2 w-full sm:max-w-lg sm:-translate-x-1/2 sm:-translate-y-1/2 bottom-0 sm:bottom-auto rounded-t-md sm:rounded-b-md bg-white shadow max-h-screen overflow-scroll',
           className
         )}
         {...rest}
       >
-        <div className="flex items-center gap-4 p-4 border-b border-gray-200">
+        <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-200 sticky top-0">
           <Dialog.Title className="text-lg font-medium">{title}</Dialog.Title>
           <Dialog.Close
             aria-label="Close"
