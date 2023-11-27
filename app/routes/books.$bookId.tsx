@@ -176,7 +176,9 @@ export default function BookRoute() {
       </div>
       <div className="grid gap-2 mt-4 p-4">
         <h1 className="font-medium text-xl">{loaderData.bookDetails.volumeInfo.title}</h1>
-        <span className="block text-gray-600">{loaderData.bookDetails.volumeInfo.authors?.join(', ')}</span>
+        <span className="block text-gray-600">
+          {new Intl.ListFormat().format(loaderData.bookDetails.volumeInfo.authors ?? [])}
+        </span>
 
         {loaderData.bookDetails.volumeInfo.publishedDate ? (
           <span className="flex text-sm gap-2 text-gray-600 leading-none">
