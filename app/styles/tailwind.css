@@ -1,3 +1,53 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* START - Modal Styles */
+@keyframes overlay-show {
+  0% { opacity: 0; }
+}
+
+@keyframes overlay-hide {
+  100% { opacity: 0; }
+}
+
+@keyframes dialog-show {
+  0% {
+    opacity: 0;
+    transform:  translateY(50px)
+  }
+}
+
+@media (min-width: 640px) { 
+  @keyframes dialog-show {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+  
+    100% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+}
+
+@keyframes dialog-hide {
+  100% {
+    opacity: 0;
+    transform: translateY(50px);
+  }
+}
+
+@media (min-width: 640px) { 
+  @keyframes dialog-hide {
+    0% {
+      transform: translate(-50%, -50%) scale(1);
+    }
+  
+    100% {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.95);
+    }
+  }
+}
+/* END - Modal Styles */
