@@ -1,27 +1,30 @@
 import { useNavigate } from '@remix-run/react'
 import { ArrowLeft } from 'lucide-react'
+import React from 'react'
 
 import { cn } from '~/utils/cn'
+import { Button } from '../ui/button'
 
-function BackButton(props: React.ComponentProps<'button'>) {
+const BackButton = React.forwardRef(function BackButton(
+  props: React.ComponentProps<'button'>,
+  forwardedRef: React.Ref<HTMLButtonElement>
+) {
   const { className, ...rest } = props
   const navigate = useNavigate()
 
   return (
-    <button
-      aria-label="Go Back"
-      className={cn(
-        'hover:bg-gray-100 rounded-full p-1 transition-[background-color,box-shadow] duration-300 focus-visible:ring-1 ring-black outline-none',
-        className
-      )}
+    <Button
+      aria-label="Back"
+      className={cn('rounded-full p-1', className)}
       onClick={() => navigate(-1)}
       title="Go Back"
-      type="button"
+      variant="ghost"
       {...rest}
+      ref={forwardedRef}
     >
       <ArrowLeft aria-hidden="true" strokeWidth={1.5} />
-    </button>
+    </Button>
   )
-}
+})
 
 export { BackButton }
