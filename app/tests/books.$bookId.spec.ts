@@ -1,16 +1,16 @@
 import { expect, test } from './utils'
 
-test('has a link back to books route', async ({ page }) => {
+test('has a back button on the page', async ({ page }) => {
   await page.goto('/books/z-h8EAAAQBAJ')
-  const booksLink = page.getByRole('link', { name: 'Back to Books' })
-  await expect(booksLink).toHaveAttribute('href', '/books')
+  const booksLink = page.getByRole('button', { name: 'Back' })
+  await expect(booksLink).toBeAttached()
 })
 
 test('has book details on the page', async ({ page }) => {
   await page.goto('/books/z-h8EAAAQBAJ')
   await expect(page.getByRole('img')).toBeAttached()
   await expect(page.getByRole('heading', { level: 1 })).toBeAttached()
-  await expect(page.getByText('Number of Pages')).toBeAttached()
+  await expect(page.getByText('Synopsis')).toBeAttached()
   await expect(page.getByRole('paragraph').first()).toBeAttached()
 })
 
