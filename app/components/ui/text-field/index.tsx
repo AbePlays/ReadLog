@@ -17,7 +17,7 @@ const TextFieldInput = React.forwardRef(function TextField(
         {...rest}
         ref={forwardedRef}
       />
-      <div className="absolute pointer-events-none inset-0 group-hover:bg-gray-100 peer-focus:ring-2 peer-focus:bg-gray-50 peer-focus:border-gray-50 ring-gray-500 border border-gray-300 rounded-lg bg-gray-50 transition duration-300 z-0" />
+      <div className="absolute pointer-events-none inset-0 enabled:group-hover:bg-gray-100 peer-focus:ring-2 peer-focus:bg-gray-50 peer-focus:border-gray-50 ring-gray-500 border border-gray-300 rounded-lg bg-gray-50 transition duration-300 z-0 peer-disabled:bg-gray-200" />
     </>
   )
 })
