@@ -9,6 +9,7 @@ import { BackButton } from '~/components/back-button'
 import { ClientOnly } from '~/components/client-only'
 import { Button } from '~/components/ui/button'
 import { Modal } from '~/components/ui/modal'
+import { TextField } from '~/components/ui/text-field'
 import { getDbClient } from '~/libs/db/index.server'
 import { BookDetailSchema } from '~/schemas/book'
 import { formatTime } from '~/utils/formatTime'
@@ -256,15 +257,16 @@ export default function BookRoute() {
                 <input name="timeSpent" readOnly type="hidden" value={time} />
 
                 <label htmlFor="pageNumber">Page Number</label>
-                <input
-                  className="block"
-                  defaultValue={loaderData.userDetails.userBook?.reading_history[0]?.page_end}
-                  id="pageNumber"
-                  name="pageNumber"
-                  type="number"
-                />
+                <TextField.Root className="mt-2">
+                  <TextField.Input
+                    defaultValue={loaderData.userDetails.userBook?.reading_history[0]?.page_end}
+                    id="pageNumber"
+                    name="pageNumber"
+                    type="number"
+                  />
+                </TextField.Root>
 
-                <div className="flex gap-4">
+                <div className="mt-4 space-x-4">
                   <Modal.Close asChild>
                     <Button variant="soft">Cancel</Button>
                   </Modal.Close>

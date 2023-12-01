@@ -1,7 +1,9 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
 import { Form, Link, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
+import { Search } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
+import { TextField } from '~/components/ui/text-field'
 import { BookSearchSchema } from '~/schemas/book'
 import { cn } from '~/utils/cn'
 
@@ -43,14 +45,19 @@ export default function SearchRoute() {
     <div>
       <h1 className="bg-red-200 text-center p-2">Search books</h1>
       <Form action="/search" method="get">
-        <input
-          aria-label="Search books"
-          className="border w-full p-2"
-          defaultValue={query}
-          name="q"
-          placeholder="Search books"
-          type="search"
-        />
+        <TextField.Root className="text-gray-900">
+          <TextField.Slot>
+            <Search />
+          </TextField.Slot>
+          <TextField.Input
+            aria-label="Search books"
+            className="h-10 text-md"
+            defaultValue={query}
+            name="q"
+            placeholder="Search books"
+            type="search"
+          />
+        </TextField.Root>
       </Form>
       {isLoadingBooks ? <span>Loading Books...</span> : null}
       <ul
