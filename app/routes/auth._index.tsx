@@ -6,8 +6,9 @@ import {
   redirect
 } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
-import { Button } from '~/components/ui/button'
 
+import { Button } from '~/components/ui/button'
+import { TextField } from '~/components/ui/text-field'
 import { signin, signup } from '~/libs/db/user.server'
 import { signinSchema, signupSchema } from '~/schemas/auth'
 import { getUserId, getUserSessionStorage } from '~/utils/session.server'
@@ -133,14 +134,14 @@ export default function AuthRoute() {
             {isSignupForm ? (
               <>
                 <label htmlFor="fullname">Fullname</label>
-                <input
-                  aria-describedby={actionData?.errors.fullname ? 'fullname-error' : undefined}
-                  aria-invalid={!!actionData?.errors.fullname}
-                  className="block border"
-                  id="fullname"
-                  name="fullname"
-                  type="text"
-                />
+                <TextField.Root>
+                  <TextField.Input
+                    aria-describedby={actionData?.errors.fullname ? 'fullname-error' : undefined}
+                    aria-invalid={!!actionData?.errors.fullname}
+                    id="fullname"
+                    name="fullname"
+                  />
+                </TextField.Root>
                 {actionData?.errors.fullname ? (
                   <p id="fullname-error" role="alert">
                     {actionData.errors.fullname}
@@ -150,14 +151,15 @@ export default function AuthRoute() {
             ) : null}
 
             <label htmlFor="email">Email</label>
-            <input
-              aria-describedby={actionData?.errors.email ? 'email-error' : undefined}
-              aria-invalid={!!actionData?.errors.email}
-              className="block border"
-              id="email"
-              name="email"
-              type="email"
-            />
+            <TextField.Root>
+              <TextField.Input
+                aria-describedby={actionData?.errors.email ? 'email-error' : undefined}
+                aria-invalid={!!actionData?.errors.email}
+                id="email"
+                name="email"
+                type="email"
+              />
+            </TextField.Root>
             {actionData?.errors.email ? (
               <p id="email-error" role="alert">
                 {actionData.errors.email}
@@ -165,14 +167,15 @@ export default function AuthRoute() {
             ) : null}
 
             <label htmlFor="password">Password</label>
-            <input
-              aria-describedby={actionData?.errors.password ? 'password-error' : undefined}
-              aria-invalid={!!actionData?.errors.password}
-              className="block border"
-              id="password"
-              name="password"
-              type="password"
-            />
+            <TextField.Root>
+              <TextField.Input
+                aria-describedby={actionData?.errors.password ? 'password-error' : undefined}
+                aria-invalid={!!actionData?.errors.password}
+                id="password"
+                name="password"
+                type="password"
+              />
+            </TextField.Root>
             {actionData?.errors.password ? (
               <p id="password-error" role="alert">
                 {actionData.errors.password}
@@ -182,14 +185,15 @@ export default function AuthRoute() {
             {isSignupForm ? (
               <>
                 <label htmlFor="confirmPassword">Confirm Password</label>
-                <input
-                  aria-describedby={actionData?.errors.confirmPassword ? 'confirmPassword-error' : undefined}
-                  aria-invalid={!!actionData?.errors.confirmPassword}
-                  className="block border"
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                />
+                <TextField.Root>
+                  <TextField.Input
+                    aria-describedby={actionData?.errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                    aria-invalid={!!actionData?.errors.confirmPassword}
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                  />
+                </TextField.Root>
                 {actionData?.errors.confirmPassword ? (
                   <p id="confirmPassword-error" role="alert">
                     {actionData.errors.confirmPassword}
