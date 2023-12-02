@@ -47,7 +47,7 @@ export default function SearchRoute() {
       <Form action="/search" method="get">
         <TextField.Root className="text-gray-900">
           <TextField.Slot>
-            <Search />
+            <Search size={20} />
           </TextField.Slot>
           <TextField.Input
             aria-label="Search books"
