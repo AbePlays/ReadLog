@@ -8,7 +8,7 @@ const password = faker.internet.password()
 test.describe('Testing sign up error handling', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/auth')
-    await page.getByLabel('Sign Up').check()
+    await page.getByText('Sign Up').click()
   })
 
   test('has field errors when empty form is submitted', async ({ page }) => {
@@ -102,7 +102,7 @@ test.describe('Testing sign in error handling', () => {
 
 test('signs up, signs out and signs back in', async ({ page }) => {
   await page.goto('/auth')
-  await page.getByLabel('Sign Up').check()
+  await page.getByText('Sign Up').check()
 
   // Sign up
   let form = page.getByRole('form', { name: 'sign up form' })
