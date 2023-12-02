@@ -8,6 +8,7 @@ import {
 import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { Button } from '~/components/ui/button'
+import { Radio } from '~/components/ui/radio'
 import { TextField } from '~/components/ui/text-field'
 import { signin, signup } from '~/libs/db/user.server'
 import { signinSchema, signupSchema } from '~/schemas/auth'
@@ -103,31 +104,34 @@ export default function AuthRoute() {
       ) : (
         <Form action={`/auth${search}`} aria-label={`${isSignupForm ? 'sign up' : 'sign in'} form`} method="post">
           <fieldset disabled={state === 'submitting'}>
-            <input
-              defaultChecked={!isSignupForm}
-              type="radio"
-              name="authType"
-              id="signin"
-              value="signin"
-              onChange={() => {
-                searchParams.set('authType', 'signin')
-                setSearchParams(searchParams)
-              }}
-            />
-            <label htmlFor="signin">Sign In</label>
-
-            <input
-              defaultChecked={isSignupForm}
-              type="radio"
-              name="authType"
-              id="signup"
-              value="signup"
-              onChange={() => {
-                searchParams.set('authType', 'signup')
-                setSearchParams(searchParams)
-              }}
-            />
-            <label htmlFor="signup">Sign Up</label>
+            <div className="flex gap-4">
+              <Radio.Root className="flex gap-1 items-center">
+                <Radio.Item
+                  defaultChecked={!isSignupForm}
+                  name="authType"
+                  id="signin"
+                  value="signin"
+                  onChange={() => {
+                    searchParams.set('authType', 'signin')
+                    setSearchParams(searchParams)
+                  }}
+                />
+                <label htmlFor="signin">Sign In</label>
+              </Radio.Root>
+              <Radio.Root className="flex gap-1 items-center">
+                <Radio.Item
+                  defaultChecked={isSignupForm}
+                  name="authType"
+                  id="signup"
+                  value="signup"
+                  onChange={() => {
+                    searchParams.set('authType', 'signup')
+                    setSearchParams(searchParams)
+                  }}
+                />
+                <label htmlFor="signup">Sign Up</label>
+              </Radio.Root>
+            </div>
 
             <br />
 
