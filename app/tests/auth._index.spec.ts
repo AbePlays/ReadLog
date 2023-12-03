@@ -8,14 +8,14 @@ const password = faker.internet.password()
 test.describe('Testing sign up error handling', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/auth')
-    await page.getByText('Sign Up').click()
+    await page.getByRole('link', { name: 'Sign Up' }).click()
   })
 
   test('has field errors when empty form is submitted', async ({ page }) => {
     const form = page.getByRole('form', { name: 'sign up form' })
     await expect(form).toBeAttached()
 
-    await expect(form.getByLabel('Fullname')).toBeAttached()
+    await expect(form.getByLabel('Full Name')).toBeAttached()
     await expect(form.getByLabel('Email')).toBeAttached()
     await expect(form.getByLabel('Password', { exact: true })).toBeAttached()
     await expect(form.getByLabel('Confirm Password')).toBeAttached()
@@ -35,7 +35,7 @@ test.describe('Testing sign up error handling', () => {
     const form = page.getByRole('form', { name: 'sign up form' })
     await expect(form).toBeAttached()
 
-    const fullnameInput = form.getByLabel('Fullname')
+    const fullnameInput = form.getByLabel('Full Name')
     await fullnameInput.fill(fullName)
 
     const emailInput = form.getByLabel('Email')
@@ -102,13 +102,13 @@ test.describe('Testing sign in error handling', () => {
 
 test('signs up, signs out and signs back in', async ({ page }) => {
   await page.goto('/auth')
-  await page.getByText('Sign Up').check()
+  await page.getByRole('link', { name: 'Sign Up' }).click()
 
   // Sign up
   let form = page.getByRole('form', { name: 'sign up form' })
   await expect(form).toBeAttached()
 
-  const fullnameInput = form.getByLabel('Fullname')
+  const fullnameInput = form.getByLabel('Full Name')
   await fullnameInput.fill(fullName)
 
   let emailInput = form.getByLabel('Email')

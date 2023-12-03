@@ -5,10 +5,9 @@ import {
   json,
   redirect
 } from '@remix-run/cloudflare'
-import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
+import { Form, Link, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { Button } from '~/components/ui/button'
-import { Radio } from '~/components/ui/radio'
 import { TextField } from '~/components/ui/text-field'
 import { signin, signup } from '~/libs/db/user.server'
 import { signinSchema, signupSchema } from '~/schemas/auth'
@@ -85,13 +84,12 @@ export default function AuthRoute() {
   const loaderData = useLoaderData<typeof loader>()
   const { search } = useLocation()
   const { state } = useNavigation()
-  const [searchParams, setSearchParams] = useSearchParams()
+  const [searchParams] = useSearchParams()
 
   const isSignupForm = searchParams.get('authType') === 'signup'
 
   return (
-    <div>
-      <h1 className="bg-red-200 text-center p-2">Get Started with ReadLog</h1>
+    <div className="max-w-screen-sm mx-auto p-4">
       {loaderData.userId ? (
         <div>
           <span>You're logged in</span>
@@ -102,116 +100,132 @@ export default function AuthRoute() {
           </Form>
         </div>
       ) : (
-        <Form action={`/auth${search}`} aria-label={`${isSignupForm ? 'sign up' : 'sign in'} form`} method="post">
-          <fieldset disabled={state === 'submitting'}>
-            <div className="flex gap-4">
-              <Radio.Root className="flex gap-1 items-center">
-                <Radio.Item
-                  defaultChecked={!isSignupForm}
-                  name="authType"
-                  id="signin"
-                  value="signin"
-                  onChange={() => {
-                    searchParams.set('authType', 'signin')
-                    setSearchParams(searchParams)
-                  }}
-                />
-                <label htmlFor="signin">Sign In</label>
-              </Radio.Root>
-              <Radio.Root className="flex gap-1 items-center">
-                <Radio.Item
-                  defaultChecked={isSignupForm}
-                  name="authType"
-                  id="signup"
-                  value="signup"
-                  onChange={() => {
-                    searchParams.set('authType', 'signup')
-                    setSearchParams(searchParams)
-                  }}
-                />
-                <label htmlFor="signup">Sign Up</label>
-              </Radio.Root>
-            </div>
+        <>
+          <div className="text-center text-gray-900">
+            <h1 className="font-medium text-2xl">Welcome to ReadLog</h1>
+            <span className="text-gray-600">Please enter your details.</span>
+          </div>
+          <Form
+            action={`/auth${search}`}
+            aria-label={`${isSignupForm ? 'sign up' : 'sign in'} form`}
+            key={String(isSignupForm)}
+            method="post"
+          >
+            <fieldset className="grid gap-4 mt-4" disabled={state === 'submitting'}>
+              <input type="hidden" name="authType" value={isSignupForm ? 'signup' : 'signin'} />
 
-            <br />
+              {isSignupForm ? (
+                <div className="space-y-2">
+                  <label className="font-medium" htmlFor="fullname">
+                    Full Name
+                  </label>
+                  <TextField.Root>
+                    <TextField.Input
+                      aria-describedby={actionData?.errors.fullname ? 'fullname-error' : undefined}
+                      aria-invalid={!!actionData?.errors.fullname}
+                      id="fullname"
+                      name="fullname"
+                    />
+                  </TextField.Root>
+                  {actionData?.errors.fullname ? (
+                    <p className="text-red-500" id="fullname-error" role="alert">
+                      {actionData.errors.fullname}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
 
-            {isSignupForm ? (
-              <>
-                <label htmlFor="fullname">Fullname</label>
+              <div className="space-y-2">
+                <label className="font-medium" htmlFor="email">
+                  Email
+                </label>
                 <TextField.Root>
                   <TextField.Input
-                    aria-describedby={actionData?.errors.fullname ? 'fullname-error' : undefined}
-                    aria-invalid={!!actionData?.errors.fullname}
-                    id="fullname"
-                    name="fullname"
+                    aria-describedby={actionData?.errors.email ? 'email-error' : undefined}
+                    aria-invalid={!!actionData?.errors.email}
+                    id="email"
+                    name="email"
+                    type="email"
                   />
                 </TextField.Root>
-                {actionData?.errors.fullname ? (
-                  <p id="fullname-error" role="alert">
-                    {actionData.errors.fullname}
+                {actionData?.errors.email ? (
+                  <p className="text-red-500" id="email-error" role="alert">
+                    {actionData.errors.email}
                   </p>
                 ) : null}
-              </>
-            ) : null}
+              </div>
 
-            <label htmlFor="email">Email</label>
-            <TextField.Root>
-              <TextField.Input
-                aria-describedby={actionData?.errors.email ? 'email-error' : undefined}
-                aria-invalid={!!actionData?.errors.email}
-                id="email"
-                name="email"
-                type="email"
-              />
-            </TextField.Root>
-            {actionData?.errors.email ? (
-              <p id="email-error" role="alert">
-                {actionData.errors.email}
-              </p>
-            ) : null}
-
-            <label htmlFor="password">Password</label>
-            <TextField.Root>
-              <TextField.Input
-                aria-describedby={actionData?.errors.password ? 'password-error' : undefined}
-                aria-invalid={!!actionData?.errors.password}
-                id="password"
-                name="password"
-                type="password"
-              />
-            </TextField.Root>
-            {actionData?.errors.password ? (
-              <p id="password-error" role="alert">
-                {actionData.errors.password}
-              </p>
-            ) : null}
-
-            {isSignupForm ? (
-              <>
-                <label htmlFor="confirmPassword">Confirm Password</label>
+              <div className="space-y-2">
+                <label className="font-medium" htmlFor="password">
+                  Password
+                </label>
                 <TextField.Root>
                   <TextField.Input
-                    aria-describedby={actionData?.errors.confirmPassword ? 'confirmPassword-error' : undefined}
-                    aria-invalid={!!actionData?.errors.confirmPassword}
-                    id="confirmPassword"
-                    name="confirmPassword"
+                    aria-describedby={actionData?.errors.password ? 'password-error' : undefined}
+                    aria-invalid={!!actionData?.errors.password}
+                    id="password"
+                    name="password"
                     type="password"
                   />
                 </TextField.Root>
-                {actionData?.errors.confirmPassword ? (
-                  <p id="confirmPassword-error" role="alert">
-                    {actionData.errors.confirmPassword}
+                {actionData?.errors.password ? (
+                  <p className="text-red-500" id="password-error" role="alert">
+                    {actionData.errors.password}
                   </p>
                 ) : null}
-              </>
-            ) : null}
+              </div>
 
-            {actionData?.errors.form ? <p role="alert">{actionData.errors.form}</p> : null}
-            <Button disabled={state === 'submitting'} type="submit" variant="solid">
-              Submit
-            </Button>
-          </fieldset>
-        </Form>
+              {isSignupForm ? (
+                <div className="space-y-2">
+                  <label className="font-medium" htmlFor="confirmPassword">
+                    Confirm Password
+                  </label>
+                  <TextField.Root>
+                    <TextField.Input
+                      aria-describedby={actionData?.errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                      aria-invalid={!!actionData?.errors.confirmPassword}
+                      id="confirmPassword"
+                      name="confirmPassword"
+                      type="password"
+                    />
+                  </TextField.Root>
+                  {actionData?.errors.confirmPassword ? (
+                    <p className="text-red-500" id="confirmPassword-error" role="alert">
+                      {actionData.errors.confirmPassword}
+                    </p>
+                  ) : null}
+                </div>
+              ) : null}
+
+              {actionData?.errors.form ? (
+                <p className="text-red-500" role="alert">
+                  {actionData.errors.form}
+                </p>
+              ) : null}
+
+              <Button disabled={state === 'submitting'} type="submit" variant="solid">
+                Submit
+              </Button>
+            </fieldset>
+          </Form>
+          <p className="mt-4 text-center">
+            {isSignupForm ? (
+              <>
+                Already have an account?
+                <Link className="font-medium ml-1 underline" to="?authType=signin">
+                  Sign In
+                </Link>
+              </>
+            ) : (
+              <>
+                Don't have an account yet?
+                <Link className="font-medium ml-1 underline" to="?authType=signup">
+                  Sign Up
+                </Link>
+              </>
+            )}
+          </p>
+        </>
       )}
     </div>
   )
