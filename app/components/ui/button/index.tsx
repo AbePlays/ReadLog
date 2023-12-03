@@ -17,7 +17,7 @@ export function getVariantClasses(variant = DEFAULT_BUTTON_VARIANT) {
     solid: 'bg-gray-900 enabled:hover:bg-gray-700 text-gray-100 focus-visible:ring focus-visible:ring-gray-500'
   }
 
-  return `rounded-lg text-sm font-medium py-2 px-4 inline-flex gap-2 items-center justify-center shrink-0 outline-none disabled:opacity-70 transition ${variantClassMap[variant]}`
+  return `rounded-lg font-medium py-2 px-4 inline-flex gap-2 items-center justify-center shrink-0 outline-none disabled:opacity-70 transition ${variantClassMap[variant]}`
 }
 
 const Button = React.forwardRef(function Button(

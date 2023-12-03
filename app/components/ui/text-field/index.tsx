@@ -12,7 +12,7 @@ const TextFieldInput = React.forwardRef(function TextField(
   return (
     <>
       <input
-        className={cn('peer z-10 outline-none relative bg-transparent text-sm block w-full py-2 first:px-2', className)}
+        className={cn('peer z-10 outline-none relative bg-transparent block w-full py-2 first:px-2', className)}
         type="text"
         {...rest}
         ref={forwardedRef}
