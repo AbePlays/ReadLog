@@ -13,33 +13,33 @@ function Navigation({
       <ul className="grid gap-2">
         <li>
           <NavItem onClick={closeNav} to="/">
-            <Home size={16} />
+            <Home aria-hidden="true" size={16} />
             Home
           </NavItem>
         </li>
         <li>
           <NavItem onClick={closeNav} to="/books">
-            <BookIcon size={16} />
+            <BookIcon aria-hidden="true" size={16} />
             Books
           </NavItem>
         </li>
         <li>
           <NavItem onClick={closeNav} to="/search">
-            <Search size={16} />
+            <Search aria-hidden="true" size={16} />
             Search
           </NavItem>
         </li>
         {isLoggedIn ? (
           <li>
             <NavItem onClick={closeNav} to="/library">
-              <Library size={16} />
+              <Library aria-hidden="true" size={16} />
               Library
             </NavItem>
           </li>
         ) : null}
         <li>
           <NavItem onClick={closeNav} to="/auth">
-            <UserCircle size={16} />
+            <UserCircle aria-hidden="true" size={16} />
             Your Account
           </NavItem>
         </li>
