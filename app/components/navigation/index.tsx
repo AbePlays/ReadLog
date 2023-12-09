@@ -1,5 +1,5 @@
 import { NavLink, type NavLinkProps } from '@remix-run/react'
-import { Home, BookIcon, Search, Library, UserCircle } from 'lucide-react'
+import { Book, Home, Library, Search, UserCircle } from 'lucide-react'
 
 import { cn } from '~/utils/cn'
 
@@ -19,7 +19,7 @@ function Navigation({
         </li>
         <li>
           <NavItem onClick={closeNav} to="/books">
-            <BookIcon aria-hidden="true" size={16} />
+            <Book aria-hidden="true" size={16} />
             Books
           </NavItem>
         </li>
