@@ -3,7 +3,6 @@ import {
   Links,
   LiveReload,
   Meta,
-  NavLink,
   Outlet,
   Scripts,
   ScrollRestoration,
@@ -11,9 +10,14 @@ import {
   useLoaderData,
   useRouteError
 } from '@remix-run/react'
+import { Menu } from 'lucide-react'
+import { useState } from 'react'
 
+import { Navigation } from '~/components/navigation'
+import { Button } from '~/components/ui/button'
+import { Modal } from '~/components/ui/modal'
 import tailwind from '~/styles/tailwind.css'
-import { getUserId } from './utils/session.server'
+import { getUserId } from '~/utils/session.server'
 
 export const links: LinksFunction = () => [
   { rel: 'manifest', href: '/site.webmanifest' },
@@ -27,6 +31,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
 export default function App() {
   const { userId } = useLoaderData<typeof loader>()
+  const [showNav, setShowNav] = useState(false)
 
   return (
     <html lang="en">
@@ -36,36 +41,36 @@ export default function App() {
         <Meta />
         <Links />
       </head>
-      <body>
-        <header>
-          <nav aria-label="Main" className="p-4 border-b">
-            <ul className="flex gap-4">
-              <li>
-                <NavLink to="/">ReadLog</NavLink>
-              </li>
-              <li>
-                <NavLink to="/books">Books</NavLink>
-              </li>
-              <li>
-                <NavLink to="/search">Search</NavLink>
-              </li>
-              {userId ? (
-                <li>
-                  <NavLink to="/library">Library</NavLink>
-                </li>
-              ) : null}
-              <li className="ml-auto">
-                <NavLink to="/auth">Your Account</NavLink>
-              </li>
-            </ul>
-          </nav>
+      <body className="sm:grid sm:grid-cols-[15rem_1fr] min-h-screen bg-stone-50">
+        <header className="px-4 pt-4 space-y-4">
+          <div className="flex justify-between items-center">
+            <span className="text-lg font-medium">ReadLog</span>
+            <Modal open={showNav} onOpenChange={setShowNav}>
+              <Modal.Button asChild>
+                <Button className="sm:hidden rounded-full p-1" variant="ghost">
+                  <Menu size={20} />
+                </Button>
+              </Modal.Button>
+
+              <Modal.Content title="Navigation">
+                <Navigation className="p-4 bg-stone-50" closeNav={() => setShowNav(false)} isLoggedIn={!!userId} />
+              </Modal.Content>
+            </Modal>
+          </div>
+
+          <hr className="hidden sm:block" />
+          <Navigation className="hidden sm:block" isLoggedIn={!!userId} />
         </header>
-        <main>
-          <Outlet />
-        </main>
-        <footer className="p-4 text-center border-t">
-          <p>Built using Remix and Cloudflare</p>
-        </footer>
+
+        <div className="mt-2 sm:rounded-tl-xl sm:border border-gray-200 overflow-hidden bg-white">
+          <main>
+            <Outlet />
+          </main>
+          <footer className="p-4 text-center border-t">
+            <p>Built using Remix and Cloudflare</p>
+          </footer>
+        </div>
+
         <ScrollRestoration />
         <Scripts />
         <LiveReload />
