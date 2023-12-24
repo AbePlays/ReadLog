@@ -1,6 +1,6 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
 import { Form, Link, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
-import { Search } from 'lucide-react'
+import { Search, SearchX } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
 import { Button } from '~/components/ui/button'
@@ -89,7 +89,7 @@ export default function SearchRoute() {
                 </Select.Content>
               </Select>
             </div>
-            <Button aria-label="Search" className="p-3" type="submit" variant="solid">
+            <Button aria-label="Search" className="p-3 rounded-xl" type="submit" variant="solid">
               <Search size={18} />
             </Button>
           </div>
@@ -97,25 +97,41 @@ export default function SearchRoute() {
       </Form>
 
       {isLoadingBooks ? <span>Loading Books...</span> : null}
-      <ul
-        aria-label="Search Results"
-        className={cn('grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6', {
-          'pointer-events-none opacity-30': isLoadingBooks
-        })}
-      >
-        {loaderData?.items?.map((book) => {
-          return (
-            <li className="w-full" key={book.id}>
-              <Link
-                className="outline-none block rounded-lg h-full transition duration-300 focus-visible:ring-2 ring-offset-2 ring-gray-500"
-                to={`/books/${book.id}`}
-              >
-                <BookCover book={book} />
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
+
+      {loaderData?.totalItems === 0 ? (
+        <div
+          className={cn('grid place-items-center my-6', {
+            'pointer-events-none opacity-30': isLoadingBooks
+          })}
+        >
+          <SearchX aria-hidden="true" className="text-gray-200" size={160} />
+          <span className="block text-lg font-medium mt-4">No Results Found</span>
+          <p className="text-gray-600">Try searching for a different book or genre.</p>
+        </div>
+      ) : (
+        <ul
+          aria-label="Search Results"
+          className={cn(
+            'grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6',
+            {
+              'pointer-events-none opacity-30': isLoadingBooks
+            }
+          )}
+        >
+          {loaderData?.items?.map((book) => {
+            return (
+              <li className="w-full" key={book.id}>
+                <Link
+                  className="outline-none block rounded-lg h-full transition duration-300 focus-visible:ring-2 ring-offset-2 ring-gray-500"
+                  to={`/books/${book.id}`}
+                >
+                  <BookCover book={book} />
+                </Link>
+              </li>
+            )
+          })}
+        </ul>
+      )}
     </>
   )
 }
