@@ -26,15 +26,9 @@ export const BookSchema = z.object({
 export const BooksSchema = z.object({
   kind: z.string(),
   totalItems: z.number(),
-  items: z.array(BookSchema)
+  items: z.array(BookSchema).optional()
 })
 
 export const BookDetailSchema = BookSchema
-
-export const BookSearchSchema = z.object({
-  kind: z.string(),
-  totalItems: z.number(),
-  items: z.array(BookSchema)
-})
 
 export type TBook = z.infer<typeof BookSchema>
