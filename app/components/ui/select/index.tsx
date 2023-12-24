@@ -25,7 +25,7 @@ const SelectTrigger = React.forwardRef(function SelectTrigger(
   return (
     <RadixSelect.Trigger
       className={cn(
-        'flex items-center justify-between rounded-lg border-gray-300 transition duration-300 p-2 text-sm gap-2 hover:bg-gray-100 border outline-none focus-visible:ring-2 focus-visible:ring-gray-500',
+        'flex items-center justify-between rounded-lg border-gray-300 transition duration-300 p-2 gap-2 hover:bg-gray-100 border outline-none focus-visible:ring-2 focus-visible:ring-gray-500',
         className
       )}
       {...props}
@@ -46,7 +46,7 @@ const SelectOption = React.forwardRef(function SelectOption(
   return (
     <RadixSelect.Item
       className={cn(
-        'text-sm rounded flex justify-between items-center gap-4 py-1.5 px-4 relative select-none data-[highlighted]:bg-gray-100 outline-none',
+        'rounded flex justify-between items-center gap-4 py-1.5 px-4 relative select-none data-[highlighted]:bg-gray-100 outline-none',
         className
       )}
       {...props}
