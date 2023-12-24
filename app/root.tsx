@@ -63,7 +63,7 @@ export default function App() {
         </header>
 
         <div className="mt-2 sm:rounded-tl-xl sm:border border-gray-200 overflow-hidden bg-white">
-          <main>
+          <main className="p-4 sm:p-8">
             <Outlet />
           </main>
           <footer className="p-4 text-center border-t">
