@@ -35,7 +35,7 @@ export default function BooksRoute() {
         aria-labelledby="popular-books"
         className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
       >
-        {loaderData.items.map((book) => {
+        {loaderData?.items?.map((book) => {
           return (
             <li className="w-full" key={book.id}>
               <Link to={`./${book.id}`}>
