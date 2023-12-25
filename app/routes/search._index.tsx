@@ -1,10 +1,11 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
 import { Form, Link, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
-import { Search, SearchX } from 'lucide-react'
+import { Book, Search, SearchX } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
 import { Button } from '~/components/ui/button'
 import { Select } from '~/components/ui/select'
+import { TextField } from '~/components/ui/text-field'
 import { BooksSchema } from '~/schemas/book'
 import { cn } from '~/utils/cn'
 
@@ -47,53 +48,30 @@ export default function SearchRoute() {
 
   return (
     <>
-      <h1 className="text-3xl font-medium">Discover</h1>
-      <Form method="get">
-        <fieldset
-          className="sm:shadow-sm sm:border border-gray-200 rounded-2xl grid sm:grid-cols-2 sm:divide-x-2 py-6 sm:px-8 mt-4 sm:mt-8 gap-8 sm:gap-0"
-          disabled={isLoadingBooks}
-        >
-          <div>
-            <label
-              className="block font-medium text-lg relative z-0 after:-z-[1] after:absolute leading-4 after:w-full after:left-0 after:bottom-0 after:bg-yellow-300 after:h-1.5 w-fit"
-              htmlFor="query"
-            >
-              Book
-            </label>
-            <input
-              className="placeholder:text-gray-500 mt-2 w-full sm:w-4/5 outline-none p-2 focus-visible:ring-2 transition duration-300 ring-gray-500 rounded"
-              defaultValue={query}
-              id="query"
-              name="q"
-              placeholder="Enter the name of a book"
-              type="search"
-            />
-          </div>
-          <div className="flex justify-between items-center sm:items-start sm:pl-8">
-            <div>
-              <label
-                className="block font-medium text-lg relative z-0 after:-z-[1] after:absolute leading-4 after:w-full after:left-0 after:bottom-0 after:bg-yellow-300 after:h-1.5 w-fit"
-                htmlFor="genre"
-              >
-                Genre
-              </label>
-              <Select defaultValue={genre} name="genre">
-                <Select.Trigger className="mt-2 border-none hover:bg-transparent" id="genre" />
-                <Select.Content>
-                  <Select.Option value="all">All</Select.Option>
-                  <Select.Option value="fantasy">Fantasy</Select.Option>
-                  <Select.Option value="fiction">Fiction</Select.Option>
-                  <Select.Option value="horror">Horror</Select.Option>
-                  <Select.Option value="mystery">Mystery</Select.Option>
-                  <Select.Option value="non-fiction">Non Fiction</Select.Option>
-                </Select.Content>
-              </Select>
-            </div>
-            <Button aria-label="Search" className="p-3 rounded-xl" type="submit" variant="solid">
-              <Search size={18} />
-            </Button>
-          </div>
-        </fieldset>
+      <h1 className="text-3xl font-semibold">Search</h1>
+      <Form className="flex flex-col md:flex-row gap-4 mt-6" method="get">
+        <TextField.Root className="bg-white flex-1">
+          <TextField.Slot>
+            <Book className="text-gray-700" size={16} />
+          </TextField.Slot>
+          <TextField.Input defaultValue={query} name="q" placeholder="Enter the name of a book" type="search" />
+        </TextField.Root>
+        <div className="flex gap-4">
+          <Select defaultValue={genre} name="genre">
+            <Select.Trigger className="flex-1 min-w-[10rem]" id="genre" />
+            <Select.Content>
+              <Select.Option value="all">All Genres</Select.Option>
+              <Select.Option value="fantasy">Fantasy</Select.Option>
+              <Select.Option value="fiction">Fiction</Select.Option>
+              <Select.Option value="horror">Horror</Select.Option>
+              <Select.Option value="mystery">Mystery</Select.Option>
+              <Select.Option value="non-fiction">Non Fiction</Select.Option>
+            </Select.Content>
+          </Select>
+          <Button aria-label="Search" className="p-3" type="submit" variant="solid">
+            <Search size={18} />
+          </Button>
+        </div>
       </Form>
 
       {isLoadingBooks ? <span>Loading Books...</span> : null}
