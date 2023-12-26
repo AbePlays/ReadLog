@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test'
 
 test('has books list when search is performed', async ({ page }) => {
   await page.goto('/search')
-  await expect(page.getByRole('heading', { name: 'Search Books' })).toBeAttached()
+  await expect(page.getByRole('heading', { name: 'Search' })).toBeAttached()
   await expect(page.getByLabel('Search books')).toBeAttached()
   const booksList = page.getByRole('list', { name: 'Search Results' })
   const books = booksList.getByRole('listitem')

@@ -54,7 +54,13 @@ export default function SearchRoute() {
           <TextField.Slot>
             <Book className="text-gray-700" size={16} />
           </TextField.Slot>
-          <TextField.Input defaultValue={query} name="q" placeholder="Enter the name of a book" type="search" />
+          <TextField.Input
+            aria-label="Search books"
+            defaultValue={query}
+            name="q"
+            placeholder="Enter the name of a book"
+            type="search"
+          />
         </TextField.Root>
         <div className="flex gap-4">
           <Select defaultValue={genre} name="genre">
