@@ -12,7 +12,7 @@ const TextFieldInput = React.forwardRef(function TextField(
   return (
     <>
       <input
-        className={cn('peer z-10 outline-none relative bg-transparent block w-full py-2 first:px-2', className)}
+        className={cn('peer z-10 outline-none relative bg-transparent block w-full py-2 first:pl-2 pr-2', className)}
         type="text"
         {...rest}
         ref={forwardedRef}
@@ -29,7 +29,7 @@ const TextFieldRoot = React.forwardRef(function TextFieldRoot(
   const { className, ...rest } = props
   return (
     <div
-      className={cn('group relative flex cursor-text', className)}
+      className={cn('group relative flex cursor-text rounded-lg', className)}
       {...rest}
       onPointerDown={composeEventHandlers(props.onPointerDown, (e) => {
         const target = e.target as HTMLElement

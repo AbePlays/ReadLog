@@ -11,7 +11,10 @@ function Select(props: RadixSelect.SelectProps) {
 function SelectContent({ children, className, ...props }: React.ComponentProps<typeof RadixSelect.Content>) {
   return (
     <RadixSelect.Portal>
-      <RadixSelect.Content className={cn('p-1 bg-white z-10 rounded-md shadow-sm border', className)} {...props}>
+      <RadixSelect.Content
+        className={cn('p-1 bg-white z-10 rounded-md shadow-sm border border-gray-200', className)}
+        {...props}
+      >
         <RadixSelect.Viewport>{children}</RadixSelect.Viewport>
       </RadixSelect.Content>
     </RadixSelect.Portal>
@@ -25,7 +28,7 @@ const SelectTrigger = React.forwardRef(function SelectTrigger(
   return (
     <RadixSelect.Trigger
       className={cn(
-        'flex items-center justify-between rounded-lg border-gray-300 transition duration-300 p-2 gap-2 hover:bg-gray-100 border outline-none focus-visible:ring-2 focus-visible:ring-gray-500',
+        'flex items-center justify-between rounded-lg border-gray-300 bg-gray-50 transition duration-300 p-2 gap-2 enabled:hover:bg-gray-100 border outline-none focus-visible:ring-2 focus-visible:ring-gray-500 disabled:bg-gray-200 focus-visible:border-gray-50',
         className
       )}
       {...props}
@@ -46,7 +49,7 @@ const SelectOption = React.forwardRef(function SelectOption(
   return (
     <RadixSelect.Item
       className={cn(
-        'rounded flex justify-between items-center gap-4 py-1.5 px-4 relative select-none data-[highlighted]:bg-gray-100 outline-none',
+        'rounded flex justify-between items-center gap-4 py-1.5 px-4 relative select-none data-[highlighted]:bg-gray-200 outline-none',
         className
       )}
       {...props}
