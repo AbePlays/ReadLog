@@ -164,8 +164,8 @@ export default function BookRoute() {
   return (
     <div className="max-w-screen-sm mx-auto">
       <div className="flex justify-between items-start">
-        <BackButton className="mt-8 ml-4" />
-        <div className="p-8 bg-gray-100">
+        <BackButton className="mt-4" />
+        <div className="p-8 bg-stone-50">
           <img
             alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}
             className="aspect-[2/3]"
@@ -175,7 +175,7 @@ export default function BookRoute() {
           />
         </div>
       </div>
-      <div className="grid gap-2 mt-4 p-4">
+      <div className="grid gap-2 mt-8">
         <h1 className="font-medium text-xl">{loaderData.bookDetails.volumeInfo.title}</h1>
         <span className="block text-gray-600">
           {new Intl.ListFormat().format(loaderData.bookDetails.volumeInfo.authors ?? [])}

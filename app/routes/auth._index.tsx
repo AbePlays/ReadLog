@@ -89,7 +89,7 @@ export default function AuthRoute() {
   const isSignupForm = searchParams.get('authType') === 'signup'
 
   return (
-    <div className="max-w-screen-sm mx-auto p-4">
+    <div className="max-w-screen-sm mx-auto">
       {loaderData.userId ? (
         <div>
           <span>You're logged in</span>
