@@ -3,6 +3,7 @@ import { Form, Link, useLoaderData, useNavigation, useSearchParams } from '@remi
 import { Book, Search, SearchX } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
+import { Spinner } from '~/components/spinner'
 import { Button } from '~/components/ui/button'
 import { Select } from '~/components/ui/select'
 import { TextField } from '~/components/ui/text-field'
@@ -75,12 +76,10 @@ export default function SearchRoute() {
             </Select.Content>
           </Select>
           <Button aria-label="Search" className="p-3" type="submit" variant="solid">
-            <Search size={18} />
+            {isLoadingBooks ? <Spinner /> : <Search size={16} />}
           </Button>
         </div>
       </Form>
-
-      {isLoadingBooks ? <span>Loading Books...</span> : null}
 
       {loaderData?.totalItems === 0 ? (
         <div
