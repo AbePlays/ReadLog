@@ -13,6 +13,13 @@ function SelectContent({ children, className, ...props }: React.ComponentProps<t
     <RadixSelect.Portal>
       <RadixSelect.Content
         className={cn('p-1 bg-white z-10 rounded-md shadow-sm border border-gray-200', className)}
+        // https://github.com/radix-ui/primitives/issues/1658
+        ref={(ref) => {
+          if (!ref) return
+          ref.ontouchstart = (e) => {
+            e.preventDefault()
+          }
+        }}
         {...props}
       >
         <RadixSelect.Viewport>{children}</RadixSelect.Viewport>
