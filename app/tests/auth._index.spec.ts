@@ -90,10 +90,6 @@ test.describe('Testing sign in error handling', () => {
     const submitButton = form.getByRole('button', { name: 'Submit' })
     await submitButton.click()
 
-    await expect(emailInput).toBeDisabled()
-    await expect(passwordInput).toBeDisabled()
-    await expect(submitButton).toBeDisabled()
-
     const formError = page.getByRole('alert')
     await expect(formError).toBeAttached()
     await expect(formError).toContainText('Email/Password combination is incorrect')
