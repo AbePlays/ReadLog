@@ -25,3 +25,25 @@ test('has books list when search is performed', async ({ page }) => {
     await expect(book.getByRole('img')).toBeAttached()
   }
 })
+
+test('has pagination present', async ({ page }) => {
+  await page.goto('/search')
+
+  const searchInput = page.getByLabel('Search books')
+  await searchInput.fill('Summer Rain')
+  await searchInput.press('Enter')
+
+  const pagination = page.getByRole('navigation', { name: 'Pagination' })
+  let prevLink = pagination.getByLabel('Go to Page 0')
+  await expect(page.getByText('Page 1')).toBeAttached()
+  let nextLink = pagination.getByLabel('Go to Page 2')
+
+  await expect(prevLink).toBeDisabled()
+  await nextLink.click()
+
+  prevLink = pagination.getByLabel('Go to Page 1')
+  await expect(page.getByText('Page 2')).toBeAttached()
+  nextLink = pagination.getByLabel('Go to Page 3')
+
+  await expect(prevLink).toBeEnabled()
+})
