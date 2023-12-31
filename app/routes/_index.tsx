@@ -1,5 +1,6 @@
 import type { MetaFunction } from '@remix-run/cloudflare'
-import { Link } from '@remix-run/react'
+
+import { Link } from '~/components/ui/link'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Home - ReadLog' }, { name: 'description', content: 'Welcome to ReadLog!' }]
