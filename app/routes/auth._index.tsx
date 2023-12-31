@@ -5,9 +5,10 @@ import {
   json,
   redirect
 } from '@remix-run/cloudflare'
-import { Form, Link, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
+import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { Button } from '~/components/ui/button'
+import { Link } from '~/components/ui/link'
 import { TextField } from '~/components/ui/text-field'
 import { signin, signup } from '~/libs/db/user.server'
 import { signinSchema, signupSchema } from '~/schemas/auth'

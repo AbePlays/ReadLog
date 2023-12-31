@@ -1,7 +1,8 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
-import { Link, useLoaderData } from '@remix-run/react'
+import { useLoaderData } from '@remix-run/react'
 
 import { BookCover } from '~/components/book-cover'
+import { Link } from '~/components/ui/link'
 import { BooksSchema } from '~/schemas/book'
 
 export const meta: MetaFunction = () => {
@@ -38,7 +39,7 @@ export default function BooksRoute() {
         {loaderData?.items?.map((book) => {
           return (
             <li className="w-full" key={book.id}>
-              <Link to={`./${book.id}`}>
+              <Link className="rounded-lg h-full" to={`./${book.id}`}>
                 <BookCover book={book} />
               </Link>
             </li>

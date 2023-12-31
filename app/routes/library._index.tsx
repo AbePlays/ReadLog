@@ -1,6 +1,7 @@
 import { type LoaderFunctionArgs, type MetaFunction, redirect } from '@remix-run/cloudflare'
-import { Link, useLoaderData } from '@remix-run/react'
+import { useLoaderData } from '@remix-run/react'
 
+import { Link } from '~/components/ui/link'
 import { getDbClient } from '~/libs/db/index.server'
 import { getUserId } from '~/utils/session.server'
 
