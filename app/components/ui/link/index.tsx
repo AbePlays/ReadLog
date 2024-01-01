@@ -28,7 +28,7 @@ function removeRemixLinkProps(props: { disabled: true } & Partial<RemixLinkProps
 const Link = React.forwardRef(function Link(props: LinkProps, forwardedRef: React.Ref<HTMLAnchorElement>) {
   const { className, ...rest } = props
   const anchorClasses = cn(
-    'outline-none block rounded transition duration-300 focus-visible:ring-2 ring-offset-2 ring-gray-500',
+    'outline-none rounded transition duration-300 focus-visible:ring-2 ring-offset-2 ring-gray-500',
     className
   )
 

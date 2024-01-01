@@ -39,7 +39,7 @@ export default function BooksRoute() {
         {loaderData?.items?.map((book) => {
           return (
             <li className="w-full" key={book.id}>
-              <Link className="rounded-lg h-full" to={`./${book.id}`}>
+              <Link className="block rounded-lg h-full" to={`./${book.id}`}>
                 <BookCover book={book} />
               </Link>
             </li>
