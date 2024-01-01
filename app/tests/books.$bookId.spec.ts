@@ -3,15 +3,15 @@ import { expect, test } from './utils'
 test('has a back button on the page', async ({ page }) => {
   await page.goto('/books/z-h8EAAAQBAJ')
   const booksLink = page.getByRole('button', { name: 'Back' })
-  await expect(booksLink).toBeAttached()
+  await expect(booksLink).toBeVisible()
 })
 
 test('has book details on the page', async ({ page }) => {
   await page.goto('/books/z-h8EAAAQBAJ')
-  await expect(page.getByRole('img')).toBeAttached()
-  await expect(page.getByRole('heading', { level: 1 })).toBeAttached()
-  await expect(page.getByText('Synopsis')).toBeAttached()
-  await expect(page.getByRole('paragraph').first()).toBeAttached()
+  await expect(page.getByRole('img')).toBeVisible()
+  await expect(page.getByRole('heading', { level: 1 })).toBeVisible()
+  await expect(page.getByText('Synopsis')).toBeVisible()
+  await expect(page.getByRole('paragraph').first()).toBeVisible()
 })
 
 test('has book details on the page for logged in user', async ({ login, page }) => {

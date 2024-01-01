@@ -5,5 +5,5 @@ test('has a link to the books route', async ({ page, login }) => {
   await page.goto('/')
   const booksLink = page.getByRole('link', { name: 'Checkout Popular Books' })
   await expect(booksLink).toHaveAttribute('href', '/books')
-  await expect(booksLink).toBeAttached()
+  await expect(booksLink).toBeVisible()
 })
