@@ -22,7 +22,7 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
   const url = new URL(request.url)
 
   const query = url.searchParams.get('q')
-  const genre = url.searchParams.get('genre') === 'all' ? '' : url.searchParams.get('genre')
+  const genre = ['all', null].includes(url.searchParams.get('genre')) ? '' : url.searchParams.get('genre')
   const page = (Number(url.searchParams.get('page') ?? '1') - 1) * 10
 
   if (query) {
@@ -86,58 +86,60 @@ export default function SearchRoute() {
         </div>
       </Form>
 
-      {loaderData?.totalItems === 0 ? (
-        <div className={cn('grid place-items-center my-6', { 'pointer-events-none opacity-30': isLoadingBooks })}>
-          <SearchX aria-hidden="true" className="text-gray-200" size={160} />
-          <span className="block text-lg font-medium mt-4">No Results Found</span>
-          <p className="text-gray-600">Try searching for a different book or genre.</p>
-        </div>
-      ) : null}
+      {loaderData ? (
+        <>
+          {(loaderData.items?.length ?? 0) > 0 ? (
+            <div className={cn({ 'pointer-events-none opacity-30': isLoadingBooks })}>
+              <ul
+                aria-label="Search Results"
+                className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
+              >
+                {loaderData.items?.map((book) => {
+                  return (
+                    <li className="w-full" key={book.id}>
+                      <Link className="block rounded-lg h-full" to={`/books/${book.id}`}>
+                        <BookCover book={book} />
+                      </Link>
+                    </li>
+                  )
+                })}
+              </ul>
 
-      {(loaderData?.items?.length ?? 0) > 0 ? (
-        <div className={cn({ 'pointer-events-none opacity-30': isLoadingBooks })}>
-          <ul
-            aria-label="Search Results"
-            className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
-          >
-            {loaderData?.items?.map((book) => {
-              return (
-                <li className="w-full" key={book.id}>
-                  <Link className="rounded-lg h-full" to={`/books/${book.id}`}>
-                    <BookCover book={book} />
-                  </Link>
-                </li>
-              )
-            })}
-          </ul>
+              {/* https://github.com/evdhiggins/book-inquiry?tab=readme-ov-file#totalitems-and-calculating-pagination */}
+              <nav aria-label="Pagination" className="flex gap-4 items-center justify-center mt-4">
+                <Link
+                  aria-label={`Go to Page ${page - 1}`}
+                  className={cn({ 'pointer-events-none opacity-30': pagination.isPreviousDisabled })}
+                  disabled={pagination.isPreviousDisabled}
+                  to={`/search?q=${query}&genre=${genre}&page=${page - 1}`}
+                >
+                  <MoveLeft size={20} />
+                </Link>
 
-          {/* https://github.com/evdhiggins/book-inquiry?tab=readme-ov-file#totalitems-and-calculating-pagination */}
-          <nav aria-label="Pagination" className="flex gap-4 items-center justify-center mt-4">
-            <Link
-              aria-label={`Go to Page ${page - 1}`}
-              className={cn({ 'pointer-events-none opacity-30': pagination.isPreviousDisabled })}
-              disabled={pagination.isPreviousDisabled}
-              to={`/search?q=${query}&genre=${genre}&page=${page - 1}`}
-            >
-              <MoveLeft size={20} />
-            </Link>
+                <div className="flex gap-4 items-center">
+                  <hr className="w-8 border-gray-300" />
+                  <span className="font-medium">Page {page}</span>
+                  <hr className="w-8 border-gray-300" />
+                </div>
 
-            <div className="flex gap-4 items-center">
-              <hr className="w-8 border-gray-300" />
-              <span className="font-medium">Page {page}</span>
-              <hr className="w-8 border-gray-300" />
+                <Link
+                  aria-label={`Go to Page ${page + 1}`}
+                  className={cn({ 'pointer-events-none opacity-30': pagination.isNextDisabled })}
+                  disabled={pagination.isNextDisabled}
+                  to={`/search?q=${query}&genre=${genre}&page=${page + 1}`}
+                >
+                  <MoveRight size={20} />
+                </Link>
+              </nav>
             </div>
-
-            <Link
-              aria-label={`Go to Page ${page + 1}`}
-              className={cn({ 'pointer-events-none opacity-30': pagination.isNextDisabled })}
-              disabled={pagination.isNextDisabled}
-              to={`/search?q=${query}&genre=${genre}&page=${page + 1}`}
-            >
-              <MoveRight size={20} />
-            </Link>
-          </nav>
-        </div>
+          ) : (
+            <div className={cn('grid place-items-center my-6', { 'pointer-events-none opacity-30': isLoadingBooks })}>
+              <SearchX aria-hidden="true" className="text-gray-200" size={160} />
+              <span className="block text-lg font-medium mt-4">No Results Found</span>
+              <p className="text-gray-600">Try searching for a different book or genre.</p>
+            </div>
+          )}
+        </>
       ) : null}
     </>
   )
