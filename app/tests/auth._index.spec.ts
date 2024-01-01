@@ -13,12 +13,12 @@ test.describe('Testing sign up error handling', () => {
 
   test('has field errors when empty form is submitted', async ({ page }) => {
     const form = page.getByRole('form', { name: 'sign up form' })
-    await expect(form).toBeAttached()
+    await expect(form).toBeVisible()
 
-    await expect(form.getByLabel('Full Name')).toBeAttached()
-    await expect(form.getByLabel('Email')).toBeAttached()
-    await expect(form.getByLabel('Password', { exact: true })).toBeAttached()
-    await expect(form.getByLabel('Confirm Password')).toBeAttached()
+    await expect(form.getByLabel('Full Name')).toBeVisible()
+    await expect(form.getByLabel('Email')).toBeVisible()
+    await expect(form.getByLabel('Password', { exact: true })).toBeVisible()
+    await expect(form.getByLabel('Confirm Password')).toBeVisible()
 
     const submitButton = form.getByRole('button', { name: 'Submit' })
     await submitButton.click()
@@ -33,7 +33,7 @@ test.describe('Testing sign up error handling', () => {
 
   test('has show password error when incorrect passwords are submitted', async ({ page }) => {
     const form = page.getByRole('form', { name: 'sign up form' })
-    await expect(form).toBeAttached()
+    await expect(form).toBeVisible()
 
     const fullnameInput = form.getByLabel('Full Name')
     await fullnameInput.fill(fullName)
@@ -51,7 +51,7 @@ test.describe('Testing sign up error handling', () => {
     await submitButton.click()
 
     const passwordError = page.getByRole('alert')
-    await expect(passwordError).toBeAttached()
+    await expect(passwordError).toBeVisible()
     await expect(passwordError).toContainText("Passwords don't match")
   })
 })
@@ -63,10 +63,10 @@ test.describe('Testing sign in error handling', () => {
 
   test('has field errors when empty form is submitted', async ({ page }) => {
     const form = page.getByRole('form', { name: 'sign in form' })
-    await expect(form).toBeAttached()
+    await expect(form).toBeVisible()
 
-    await expect(form.getByLabel('Email')).toBeAttached()
-    await expect(form.getByLabel('Password')).toBeAttached()
+    await expect(form.getByLabel('Email')).toBeVisible()
+    await expect(form.getByLabel('Password')).toBeVisible()
 
     const submitButton = form.getByRole('button', { name: 'Submit' })
     await submitButton.click()
@@ -79,7 +79,7 @@ test.describe('Testing sign in error handling', () => {
 
   test('has form error when sign in fails', async ({ page }) => {
     const form = page.getByRole('form', { name: 'sign in form' })
-    await expect(form).toBeAttached()
+    await expect(form).toBeVisible()
 
     const emailInput = form.getByLabel('Email')
     await emailInput.fill(email)
@@ -91,7 +91,7 @@ test.describe('Testing sign in error handling', () => {
     await submitButton.click()
 
     const formError = page.getByRole('alert')
-    await expect(formError).toBeAttached()
+    await expect(formError).toBeVisible()
     await expect(formError).toContainText('Email/Password combination is incorrect')
   })
 })
@@ -102,7 +102,7 @@ test('signs up, signs out and signs back in', async ({ page }) => {
 
   // Sign up
   let form = page.getByRole('form', { name: 'sign up form' })
-  await expect(form).toBeAttached()
+  await expect(form).toBeVisible()
 
   const fullnameInput = form.getByLabel('Full Name')
   await fullnameInput.fill(fullName)
@@ -131,7 +131,7 @@ test('signs up, signs out and signs back in', async ({ page }) => {
 
   // Sign in
   form = page.getByRole('form', { name: 'sign in form' })
-  await expect(form).toBeAttached()
+  await expect(form).toBeVisible()
 
   emailInput = form.getByLabel('Email')
   await emailInput.fill(email)

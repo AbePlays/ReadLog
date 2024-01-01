@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/test'
 
 test('has books list when search is performed', async ({ page }) => {
   await page.goto('/search')
-  await expect(page.getByRole('heading', { name: 'Search' })).toBeAttached()
-  await expect(page.getByLabel('Search books')).toBeAttached()
+  await expect(page.getByRole('heading', { name: 'Search' })).toBeVisible()
+  await expect(page.getByLabel('Search books')).toBeVisible()
   const booksList = page.getByRole('list', { name: 'Search Results' })
   const books = booksList.getByRole('listitem')
   await expect(books).toHaveCount(0)
@@ -20,9 +20,9 @@ test('has books list when search is performed', async ({ page }) => {
 
   for (let i = 0; i < booksCount; ++i) {
     const book = books.nth(i)
-    await expect(book.getByRole('heading', { level: 2 })).toBeAttached()
-    await expect(book.getByRole('link')).toBeAttached()
-    await expect(book.getByRole('img')).toBeAttached()
+    await expect(book.getByRole('heading', { level: 2 })).toBeVisible()
+    await expect(book.getByRole('link')).toBeVisible()
+    await expect(book.getByRole('img')).toBeVisible()
   }
 })
 
@@ -35,14 +35,14 @@ test('has pagination present', async ({ page }) => {
 
   const pagination = page.getByRole('navigation', { name: 'Pagination' })
   let prevLink = pagination.getByLabel('Go to Page 0')
-  await expect(page.getByText('Page 1')).toBeAttached()
+  await expect(pagination.getByText('Page 1')).toBeVisible()
   let nextLink = pagination.getByLabel('Go to Page 2')
 
   await expect(prevLink).toBeDisabled()
   await nextLink.click()
 
   prevLink = pagination.getByLabel('Go to Page 1')
-  await expect(page.getByText('Page 2')).toBeAttached()
+  await expect(pagination.getByText('Page 2')).toBeVisible()
   nextLink = pagination.getByLabel('Go to Page 3')
 
   await expect(prevLink).toBeEnabled()
