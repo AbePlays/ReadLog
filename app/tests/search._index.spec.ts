@@ -13,7 +13,7 @@ test('has books list when search is performed', async ({ page }) => {
   await page.keyboard.press('Enter')
 
   await expect(page.getByText('Loading...')).toBeAttached()
-  await page.waitForResponse((res) => res.url().includes('search?q=Summer+Rain&genre=all'))
+  await page.waitForResponse((res) => res.url().includes('search?q=Summer+Rain&genre=all&_data=routes%2Fsearch._index'))
   await expect(page.getByText('Loading...')).not.toBeAttached()
 
   const booksCount = await books.count()
