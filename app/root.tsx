@@ -47,7 +47,7 @@ export default function App() {
             <span className="text-lg font-medium">ReadLog</span>
             <Modal open={showNav} onOpenChange={setShowNav}>
               <Modal.Button asChild>
-                <Button className="sm:hidden rounded-full p-1" variant="ghost">
+                <Button className="sm:hidden h-auto p-1" variant="ghost">
                   <Menu size={20} />
                 </Button>
               </Modal.Button>
