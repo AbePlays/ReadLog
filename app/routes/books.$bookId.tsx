@@ -164,7 +164,7 @@ export default function BookRoute() {
   return (
     <div className="max-w-screen-sm mx-auto">
       <div className="flex justify-between items-start">
-        <BackButton className="mt-4 h-auto p-1 rounded-full" />
+        <BackButton className="mt-4 rounded-full" />
         <div className="p-8 bg-stone-50">
           <img
             alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}

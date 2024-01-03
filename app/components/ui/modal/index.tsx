@@ -2,7 +2,7 @@ import * as Dialog from '@radix-ui/react-dialog'
 import { X } from 'lucide-react'
 
 import { cn } from '~/utils/cn'
-import { Button } from '../button'
+import { IconButton } from '../icon-button'
 
 function Modal(props: Dialog.DialogProps) {
   return <Dialog.Root {...props} />
@@ -22,9 +22,9 @@ function ModalContent({ children, className, title, ...rest }: { title: string }
         <div className="flex items-center gap-4 p-4 bg-white border-b border-gray-200 sticky top-0">
           <Dialog.Title className="text-lg font-medium">{title}</Dialog.Title>
           <Dialog.Close aria-label="Close" asChild>
-            <Button className="ml-auto h-auto p-1 rounded-full" variant="ghost">
+            <IconButton className="ml-auto rounded-full" variant="ghost">
               <X aria-hidden="true" size={18} />
-            </Button>
+            </IconButton>
           </Dialog.Close>
         </div>
         {children}

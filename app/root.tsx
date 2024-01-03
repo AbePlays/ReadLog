@@ -14,7 +14,7 @@ import { Menu } from 'lucide-react'
 import { useState } from 'react'
 
 import { Navigation } from '~/components/navigation'
-import { Button } from '~/components/ui/button'
+import { IconButton } from '~/components/ui/icon-button'
 import { Modal } from '~/components/ui/modal'
 import tailwind from '~/styles/tailwind.css'
 import { getUserId } from '~/utils/session.server'
@@ -47,9 +47,9 @@ export default function App() {
             <span className="text-lg font-medium">ReadLog</span>
             <Modal open={showNav} onOpenChange={setShowNav}>
               <Modal.Button asChild>
-                <Button className="sm:hidden h-auto p-1" variant="ghost">
+                <IconButton className="sm:hidden rounded-full" variant="ghost">
                   <Menu size={20} />
-                </Button>
+                </IconButton>
               </Modal.Button>
 
               <Modal.Content title="Navigation">

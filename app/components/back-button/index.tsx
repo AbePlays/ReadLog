@@ -2,7 +2,7 @@ import { useNavigate } from '@remix-run/react'
 import { ArrowLeft } from 'lucide-react'
 import React from 'react'
 
-import { Button } from '../ui/button'
+import { IconButton } from '../ui/icon-button'
 
 const BackButton = React.forwardRef(function BackButton(
   props: React.ComponentProps<'button'>,
@@ -11,7 +11,7 @@ const BackButton = React.forwardRef(function BackButton(
   const navigate = useNavigate()
 
   return (
-    <Button
+    <IconButton
       aria-label="Back"
       onClick={() => navigate(-1)}
       title="Go Back"
@@ -20,7 +20,7 @@ const BackButton = React.forwardRef(function BackButton(
       ref={forwardedRef}
     >
       <ArrowLeft aria-hidden="true" strokeWidth={1.5} />
-    </Button>
+    </IconButton>
   )
 })
 
