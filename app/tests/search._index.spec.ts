@@ -13,7 +13,10 @@ test('has books list when search is performed', async ({ page }) => {
   await page.keyboard.press('Enter')
 
   await expect(page.getByText('Loading...')).toBeAttached()
-  await page.waitForResponse((res) => res.url().includes('search?q=Summer+Rain&genre=all&_data=routes%2Fsearch._index'))
+  await page.waitForResponse((res) => {
+    const url = new URL(res.url())
+    return url.pathname === '/search' && url.search === '?q=Summer+Rain&genre=all&_data=routes%2Fsearch._index'
+  })
   await expect(page.getByText('Loading...')).not.toBeAttached()
 
   const booksCount = await books.count()
@@ -35,14 +38,14 @@ test('has pagination present', async ({ page }) => {
 
   const pagination = page.getByRole('navigation', { name: 'Pagination' })
   let prevLink = pagination.getByLabel('Go to Page 0')
-  await expect(pagination.getByText('Page 1')).toBeVisible()
+  await expect(pagination.getByText('Page 1', { exact: true })).toBeVisible()
   let nextLink = pagination.getByLabel('Go to Page 2')
 
   await expect(prevLink).toBeDisabled()
   await nextLink.click()
 
   prevLink = pagination.getByLabel('Go to Page 1')
-  await expect(pagination.getByText('Page 2')).toBeVisible()
+  await expect(pagination.getByText('Page 2', { exact: true })).toBeVisible()
   nextLink = pagination.getByLabel('Go to Page 3')
 
   await expect(prevLink).toBeEnabled()
