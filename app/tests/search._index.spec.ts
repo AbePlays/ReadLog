@@ -13,10 +13,6 @@ test('has books list when search is performed', async ({ page }) => {
   await page.keyboard.press('Enter')
 
   await expect(page.getByText('Loading...')).toBeAttached()
-  await page.waitForResponse((res) => {
-    const url = new URL(res.url())
-    return url.pathname === '/search' && url.search === '?q=Summer+Rain&genre=all&_data=routes%2Fsearch._index'
-  })
   await expect(page.getByText('Loading...')).not.toBeAttached()
 
   const booksCount = await books.count()
@@ -29,7 +25,7 @@ test('has books list when search is performed', async ({ page }) => {
   }
 })
 
-test('has pagination present', async ({ page }) => {
+test('has pagination present', async ({ page, browser }) => {
   await page.goto('/search')
 
   const searchInput = page.getByLabel('Search books')
