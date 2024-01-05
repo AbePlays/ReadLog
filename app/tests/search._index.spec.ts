@@ -12,8 +12,8 @@ test('has books list when search is performed', async ({ page }) => {
   await searchInput.fill('Summer Rain')
   await page.keyboard.press('Enter')
 
-  await expect(page.getByText('Loading...')).toBeAttached()
-  await expect(page.getByText('Loading...')).not.toBeAttached()
+  await expect(page.getByTestId('loader')).toBeAttached()
+  await expect(page.getByTestId('loader')).not.toBeAttached()
 
   const booksCount = await books.count()
 
@@ -25,7 +25,7 @@ test('has books list when search is performed', async ({ page }) => {
   }
 })
 
-test('has pagination present', async ({ page, browser }) => {
+test('has pagination present', async ({ page }) => {
   await page.goto('/search')
 
   const searchInput = page.getByLabel('Search books')
@@ -41,8 +41,9 @@ test('has pagination present', async ({ page, browser }) => {
   await nextLink.click()
 
   prevLink = pagination.getByLabel('Go to Page 1')
+  await expect(prevLink).toBeVisible()
+  await expect(prevLink).toBeEnabled()
   await expect(pagination.getByText('Page 2', { exact: true })).toBeVisible()
   nextLink = pagination.getByLabel('Go to Page 3')
-
-  await expect(prevLink).toBeEnabled()
+  await expect(nextLink).toBeVisible()
 })
