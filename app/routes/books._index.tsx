@@ -52,7 +52,13 @@ export default function BooksRoute() {
 
       <ToggleGroup className="mt-4" defaultValue={searchParams.get('genre') ?? ALL_GENRES} type="single">
         {[ALL_GENRES, ...GENRES.sort()].map((genre) => (
-          <ToggleGroup.Item asChild className="capitalize" key={genre} value={genre}>
+          <ToggleGroup.Item
+            asChild
+            className="capitalize"
+            disabled={searchParams.get('genre') === genre}
+            key={genre}
+            value={genre}
+          >
             <Link to={`?genre=${genre}`}>{genre}</Link>
           </ToggleGroup.Item>
         ))}
