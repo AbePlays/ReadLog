@@ -1,10 +1,11 @@
-import * as ToggleGroup from '@radix-ui/react-toggle-group'
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
-import { Form, useLoaderData, useSearchParams, useSubmit } from '@remix-run/react'
+import { Form, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
+import { ToggleGroup } from '~/components/ui/toggle-group'
 import { BooksSchema } from '~/schemas/book'
+import { cn } from '~/utils/cn'
 
 export const meta: MetaFunction = () => {
   return [
@@ -16,11 +17,16 @@ export const meta: MetaFunction = () => {
   ]
 }
 
+const ALL_GENRES = 'all genres'
 const GENRES = ['fiction', 'nonfiction', 'mystery', 'science', 'fantasy']
 
 export async function loader({ context, request }: LoaderFunctionArgs) {
   const url = new URL(request.url)
-  const genres = url.searchParams.get('genre') || GENRES.map((genre) => `'${genre}'`).join(',')
+  let genres = url.searchParams.get('genre') ?? ALL_GENRES
+
+  if (genres === ALL_GENRES) {
+    genres = GENRES.map((genre) => `'${genre}'`).join(',')
+  }
 
   const res = await fetch(
     `https://www.googleapis.com/books/v1/volumes?q=subject:${genres}&orderBy=relevance&key=${context.env.GOOGLE_BOOKS_API_KEY}`
@@ -32,8 +38,10 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
 
 export default function BooksRoute() {
   const loaderData = useLoaderData<typeof loader>()
+  const { location, state } = useNavigation()
   const [searchParams] = useSearchParams()
-  const submit = useSubmit()
+
+  const isLoadingBooks = state === 'loading' && location.pathname === '/books'
 
   return (
     <>
@@ -42,37 +50,32 @@ export default function BooksRoute() {
       </h1>
       <span className="mt-2 text-gray-500">Discover the best books from a variety of genres.</span>
 
-      <Form method="get">
-        <span>Filter by:</span>
+      <ToggleGroup className="mt-4" defaultValue={searchParams.get('genre') ?? ALL_GENRES} type="single">
+        {[ALL_GENRES, ...GENRES.sort()].map((genre) => (
+          <ToggleGroup.Item asChild className="capitalize" key={genre} value={genre}>
+            <Link to={`?genre=${genre}`}>{genre}</Link>
+          </ToggleGroup.Item>
+        ))}
+      </ToggleGroup>
 
-        <ToggleGroup.Root
-          className="space-x-2"
-          defaultValue={searchParams.get('genre') ?? ''}
-          onValueChange={(values) => submit({ genre: values })}
-          type="single"
-        >
-          {GENRES.sort().map((genre) => (
-            <ToggleGroup.Item className="data-[state=on]:bg-gray-400 p-1" key={genre} value={genre}>
-              {genre}
-            </ToggleGroup.Item>
-          ))}
-        </ToggleGroup.Root>
-      </Form>
-
-      <ul
-        aria-labelledby="popular-books"
-        className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
-      >
-        {loaderData?.items?.map((book) => {
-          return (
-            <li className="w-full" key={book.id}>
-              <Link className="block rounded-lg h-full" to={`./${book.id}`}>
-                <BookCover book={book} />
-              </Link>
-            </li>
-          )
-        })}
-      </ul>
+      {loaderData ? (
+        <div className={cn({ 'pointer-events-none opacity-30': isLoadingBooks })}>
+          <ul
+            aria-labelledby="popular-books"
+            className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
+          >
+            {loaderData.items?.map((book) => {
+              return (
+                <li className="w-full" key={book.id}>
+                  <Link className="block rounded-lg h-full" to={`./${book.id}`}>
+                    <BookCover book={book} />
+                  </Link>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      ) : null}
     </>
   )
 }
