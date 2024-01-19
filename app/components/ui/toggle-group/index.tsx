@@ -15,7 +15,7 @@ const ToggleGroupItem = React.forwardRef(function ToggleGroupItem(
   return (
     <RadixToggleGroup.Item
       className={cn(
-        'data-[state=off]:hover:bg-gray-200 data-[state=on]:hover:bg-gray-600 data-[state=on]:bg-gray-500 data-[state=on]:text-gray-100 px-3 text-gray-700 bg-gray-100 font-medium transition-colors py-1 rounded-full border border-gray-200 text-sm outline-none focus-visible:ring-2 ring-offset-1 focus-visible:ring-gray-500',
+        'data-[state=off]:hover:bg-gray-200 data-[state=on]:hover:bg-gray-700 data-[state=on]:bg-gray-600 data-[state=on]:text-gray-100 px-3 text-gray-700 bg-gray-100 font-medium transition-colors py-1 rounded-full border border-gray-200 text-sm outline-none focus-visible:ring-2 ring-offset-1 focus-visible:ring-gray-600',
         className
       )}
       {...props}

@@ -1,5 +1,5 @@
 import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
-import { Form, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
+import { useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
@@ -48,17 +48,11 @@ export default function BooksRoute() {
       <h1 className="text-3xl font-semibold" id="popular-books">
         Popular Books
       </h1>
-      <span className="mt-2 text-gray-500">Discover the best books from a variety of genres.</span>
+      <span className="mt-2 block text-gray-500">Discover the best books from a variety of genres.</span>
 
-      <ToggleGroup className="mt-4" defaultValue={searchParams.get('genre') ?? ALL_GENRES} type="single">
+      <ToggleGroup className="mt-4" type="single" value={searchParams.get('genre') ?? ALL_GENRES}>
         {[ALL_GENRES, ...GENRES.sort()].map((genre) => (
-          <ToggleGroup.Item
-            asChild
-            className="capitalize"
-            disabled={searchParams.get('genre') === genre}
-            key={genre}
-            value={genre}
-          >
+          <ToggleGroup.Item asChild className="capitalize" key={genre} value={genre}>
             <Link to={`?genre=${genre}`}>{genre}</Link>
           </ToggleGroup.Item>
         ))}
