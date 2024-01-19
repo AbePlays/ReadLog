@@ -48,11 +48,11 @@ export default function BooksRoute() {
       <h1 className="text-3xl font-semibold" id="popular-books">
         Popular Books
       </h1>
-      <span className="mt-2 block text-gray-500">Discover the best books from a variety of genres.</span>
+      <span className="text-gray-500">Discover the best books from a variety of genres.</span>
 
       <ToggleGroup
         aria-label="Genre selection"
-        className="mt-4"
+        className="mt-6"
         type="single"
         value={searchParams.get('genre') ?? ALL_GENRES}
       >
