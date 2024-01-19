@@ -50,7 +50,12 @@ export default function BooksRoute() {
       </h1>
       <span className="mt-2 block text-gray-500">Discover the best books from a variety of genres.</span>
 
-      <ToggleGroup className="mt-4" type="single" value={searchParams.get('genre') ?? ALL_GENRES}>
+      <ToggleGroup
+        aria-label="Genre selection"
+        className="mt-4"
+        type="single"
+        value={searchParams.get('genre') ?? ALL_GENRES}
+      >
         {[ALL_GENRES, ...GENRES.sort()].map((genre) => (
           <ToggleGroup.Item asChild className="capitalize" key={genre} value={genre}>
             <Link to={`?genre=${genre}`}>{genre}</Link>
