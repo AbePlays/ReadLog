@@ -1,8 +1,12 @@
-import { type LoaderFunctionArgs, type MetaFunction, redirect } from '@remix-run/cloudflare'
-import { useLoaderData } from '@remix-run/react'
+import * as Tabs from '@radix-ui/react-tabs'
+import { type LoaderFunctionArgs, type MetaFunction, json, redirect } from '@remix-run/cloudflare'
+import { type ShouldRevalidateFunctionArgs, useLoaderData, useSearchParams } from '@remix-run/react'
+import { SearchX } from 'lucide-react'
 
+import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
 import { getDbClient } from '~/libs/db/index.server'
+import { BookSchema } from '~/schemas/book'
 import { getUserId } from '~/utils/session.server'
 
 export const meta: MetaFunction = () => {
@@ -16,42 +20,79 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
   }
 
   const xata = getDbClient(context)
-  const books = await xata.db.user_books.filter({ user_id: userId }).getAll()
+  const userBooks = await xata.db.user_books.filter({ user_id: userId }).getAll()
 
-  return books
+  const books = await Promise.all(
+    userBooks.map(async (userBook) => {
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes/${userBook.book_id}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
+      )
+      const data = await response.json()
+      const book = BookSchema.parse(data)
+      return { ...book, readStatus: userBook.read_status }
+    })
+  )
+
+  return json(books)
+}
+
+export function shouldRevalidate(_: ShouldRevalidateFunctionArgs) {
+  return false
+}
+
+const READ_STATUS_LABELS = {
+  reading: 'Currently Reading',
+  'want-to-read': 'Want To Read',
+  read: 'Finished Reading'
 }
 
 export default function LibraryRoute() {
   const loaderData = useLoaderData<typeof loader>()
+  const [searchParams] = useSearchParams()
+
+  const readStatus = searchParams.get('read-status') ?? 'reading'
 
   return (
-    <div>
-      <h1 className="bg-red-200 text-center p-2" id="your-library">
-        Your ReadLog Library
+    <>
+      <h1 className="text-3xl font-semibold" id="popular-books">
+        Library
       </h1>
-      {loaderData.length > 0 ? (
-        <ul aria-labelledby="your-library">
-          {loaderData.map((book) => (
-            <li key={book.id}>
-              <Link to={`/books/${book.book_id}`}>
-                <img
-                  alt={`Cover of a book titled ${book.name}`}
-                  height="180px"
-                  src={book.image_url ?? ''}
-                  width="120px"
-                />
-                <h2 className="font-bold">{book.name}</h2>
-                <span>Reading Status: </span>
-                <span>{book.read_status}</span>
-              </Link>
-            </li>
+
+      <Tabs.Root value={readStatus}>
+        <Tabs.List>
+          {Object.entries(READ_STATUS_LABELS).map(([status, label]) => (
+            <Tabs.Trigger asChild className='data-[state="active"]:bg-gray-200' key={status} value={status}>
+              <Link to={`?read-status=${status}`}>{label}</Link>
+            </Tabs.Trigger>
           ))}
-        </ul>
-      ) : (
-        <p>
-          No books added yet. <Link to="/books">Explore books</Link> to get started.
-        </p>
-      )}
-    </div>
+        </Tabs.List>
+
+        {Object.entries(READ_STATUS_LABELS).map(([status]) => {
+          const books = loaderData.filter((book) => book.readStatus === status)
+
+          return (
+            <Tabs.Content key={status} value={status}>
+              {books.length === 0 ? (
+                <div className="grid place-items-center my-6">
+                  <SearchX aria-hidden="true" className="text-gray-200" size={160} />
+                  <span className="block text-lg font-medium mt-4">No Books Found</span>
+                  <p className="text-gray-600">Try searching for a book or adding a new book to your library.</p>
+                </div>
+              ) : (
+                <ul className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6">
+                  {books.map((book) => (
+                    <li className="w-full" key={book.id}>
+                      <Link className="block rounded-lg h-full" to={`/books/${book.id}`}>
+                        <BookCover book={book} />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </Tabs.Content>
+          )
+        })}
+      </Tabs.Root>
+    </>
   )
 }
