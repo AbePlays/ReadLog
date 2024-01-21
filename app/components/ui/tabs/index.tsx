@@ -13,7 +13,7 @@ const TabsList = React.forwardRef(function TabsList(
   const { className, ...rest } = props
   return (
     <RadixTabs.List
-      className={cn('relative after:absolute after:w-full after:bottom-0 after:left-0 after:border-b-2', className)}
+      className={cn('relative flex after:absolute after:w-full after:bottom-0 after:left-0 after:border-b', className)}
       {...rest}
       ref={forwardedRef}
     />
