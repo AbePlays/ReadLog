@@ -1,10 +1,10 @@
-import * as Tabs from '@radix-ui/react-tabs'
 import { type LoaderFunctionArgs, type MetaFunction, json, redirect } from '@remix-run/cloudflare'
 import { type ShouldRevalidateFunctionArgs, useLoaderData, useSearchParams } from '@remix-run/react'
 import { SearchX } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
+import { Tabs } from '~/components/ui/tabs'
 import { getDbClient } from '~/libs/db/index.server'
 import { BookSchema } from '~/schemas/book'
 import { getUserId } from '~/utils/session.server'
@@ -58,10 +58,10 @@ export default function LibraryRoute() {
         Library
       </h1>
 
-      <Tabs.Root value={readStatus}>
+      <Tabs activationMode="manual" className="mt-6" value={readStatus}>
         <Tabs.List>
           {Object.entries(READ_STATUS_LABELS).map(([status, label]) => (
-            <Tabs.Trigger asChild className='data-[state="active"]:bg-gray-200' key={status} value={status}>
+            <Tabs.Trigger asChild key={status} value={status}>
               <Link to={`?read-status=${status}`}>{label}</Link>
             </Tabs.Trigger>
           ))}
@@ -92,7 +92,7 @@ export default function LibraryRoute() {
             </Tabs.Content>
           )
         })}
-      </Tabs.Root>
+      </Tabs>
     </>
   )
 }
