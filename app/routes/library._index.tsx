@@ -41,9 +41,9 @@ export function shouldRevalidate(_: ShouldRevalidateFunctionArgs) {
 }
 
 const READ_STATUS_LABELS = {
-  reading: 'Currently Reading',
-  'want-to-read': 'Want To Read',
-  read: 'Finished Reading'
+  reading: 'Reading',
+  'want-to-read': 'To Read',
+  finished: 'Finished'
 }
 
 export default function LibraryRoute() {
@@ -55,8 +55,9 @@ export default function LibraryRoute() {
   return (
     <>
       <h1 className="text-3xl font-semibold" id="popular-books">
-        Library
+        Your Library
       </h1>
+      <span className="text-gray-500">Manage, explore, and revisit your personal book collection.</span>
 
       <Tabs activationMode="manual" className="mt-6" value={readStatus}>
         <Tabs.List>
