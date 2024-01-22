@@ -1,6 +1,6 @@
 import { type LoaderFunctionArgs, type MetaFunction, json, redirect } from '@remix-run/cloudflare'
 import { type ShouldRevalidateFunctionArgs, useLoaderData, useSearchParams } from '@remix-run/react'
-import { SearchX } from 'lucide-react'
+import { BookCheck, BookMarked, BookOpenText, SearchX } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
@@ -40,11 +40,11 @@ export function shouldRevalidate(_: ShouldRevalidateFunctionArgs) {
   return false
 }
 
-const READ_STATUS_LABELS = {
-  reading: 'Reading',
-  'want-to-read': 'To Read',
-  finished: 'Finished'
-}
+const TABS = [
+  { id: 'reading', label: 'Reading', icon: <BookOpenText aria-hidden="true" className="w-4 h-4" /> },
+  { id: 'want-to-read', label: 'To Read', icon: <BookMarked aria-hidden="true" className="w-4 h-4" /> },
+  { id: 'finished', label: 'Finished', icon: <BookCheck aria-hidden="true" className="w-4 h-4" /> }
+]
 
 export default function LibraryRoute() {
   const loaderData = useLoaderData<typeof loader>()
@@ -61,18 +61,21 @@ export default function LibraryRoute() {
 
       <Tabs activationMode="manual" className="mt-6" value={readStatus}>
         <Tabs.List>
-          {Object.entries(READ_STATUS_LABELS).map(([status, label]) => (
-            <Tabs.Trigger asChild key={status} value={status}>
-              <Link to={`?read-status=${status}`}>{label}</Link>
+          {TABS.map((tab) => (
+            <Tabs.Trigger asChild key={tab.id} value={tab.id}>
+              <Link className="flex gap-2 items-center" to={`?read-status=${tab.id}`}>
+                {tab.icon}
+                {tab.label}
+              </Link>
             </Tabs.Trigger>
           ))}
         </Tabs.List>
 
-        {Object.entries(READ_STATUS_LABELS).map(([status]) => {
-          const books = loaderData.filter((book) => book.readStatus === status)
+        {TABS.map((tab) => {
+          const books = loaderData.filter((book) => book.readStatus === tab.id)
 
           return (
-            <Tabs.Content key={status} value={status}>
+            <Tabs.Content key={tab.id} value={tab.id}>
               {books.length === 0 ? (
                 <div className="grid place-items-center my-6">
                   <SearchX aria-hidden="true" className="text-gray-200" size={160} />
