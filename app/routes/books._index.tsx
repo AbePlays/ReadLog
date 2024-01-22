@@ -67,7 +67,7 @@ export default function BooksRoute() {
         <div className={cn({ 'pointer-events-none opacity-30': isLoadingBooks })}>
           <ul
             aria-labelledby="popular-books"
-            className="grid grid-cols-[repeat(auto-fit,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
+            className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
           >
             {loaderData.items?.map((book) => {
               return (
