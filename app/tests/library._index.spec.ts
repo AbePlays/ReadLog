@@ -5,18 +5,26 @@ test('should redirect to auth page for unauthorized users', async ({ page }) => 
   await expect(page).toHaveURL('/auth')
 })
 
+test('has tabs present', async ({ login, page }) => {
+  await login()
+  await page.goto('/library')
+  await expect(page.getByRole('heading', { level: 1 })).toHaveText('Your Library')
+
+  const tabList = page.getByRole('tablist', { name: 'Manage your library' })
+  await expect(tabList).toBeVisible()
+  expect(await tabList.getByRole('tab').count()).toBe(3)
+})
+
 test('has books present for logged in user', async ({ addBook, login, page }) => {
   const { id } = await login()
   await page.goto('/library')
 
-  let booksList = page.getByRole('list', { name: 'Your ReadLog Library' })
-  let books = booksList.getByRole('listitem')
-  expect(await books.count()).toBe(0)
+  await expect(page.getByText('No Books Found')).toBeVisible()
 
   await addBook(id)
   await page.reload()
 
-  booksList = page.getByRole('list', { name: 'Your ReadLog Library' })
-  books = booksList.getByRole('listitem')
-  expect(await books.count()).toBe(1)
+  const tabPanel = page.getByRole('tabpanel')
+  await expect(tabPanel.getByRole('listitem')).toBeVisible()
+  expect(await tabPanel.getByRole('listitem').count()).toBe(1)
 })

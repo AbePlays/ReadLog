@@ -56,7 +56,8 @@ export async function insertBook(context: { env: z.infer<typeof AppEnvSchema> },
   const xata = getDbClient(context)
 
   await xata.db.user_books.create({
-    book_id: faker.string.uuid(),
+    // An acutal book id is needed
+    book_id: 'Fs3HDwAAQBAJ',
     image_url: faker.image.url(),
     name: faker.commerce.productName(),
     reading_history: [
@@ -113,15 +114,14 @@ test.afterEach(async () => {
   const context = await getContext()
   const xata = getDbClient(context)
   const users = await xata.db.users.getAll()
+  const books = await xata.db.user_books.getAll()
 
-  for (const user of users) {
-    const records = await xata.db.user_books.filter({ user_id: user.id }).getAll()
-    for (const record of records) {
-      await xata.db.user_books.delete(record.id)
-    }
-  }
+  // Use map to create an array of promises
+  const userPromises = users.map((user) => user.delete())
+  const bookPromises = books.map((book) => book.delete())
 
-  await xata.db.users.delete(users.map((user) => user.id))
+  // Use Promise.all with the arrays of promises
+  await Promise.all([...userPromises, ...bookPromises])
 })
 
 export const { expect } = test
