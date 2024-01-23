@@ -60,7 +60,7 @@ export default function LibraryRoute() {
       <span className="text-gray-500">Manage, explore, and revisit your personal book collection.</span>
 
       <Tabs activationMode="manual" className="mt-6" value={readStatus}>
-        <Tabs.List>
+        <Tabs.List aria-label="Manage your library">
           {TABS.map((tab) => (
             <Tabs.Trigger asChild key={tab.id} value={tab.id}>
               <Link className="flex gap-2 items-center" to={`?read-status=${tab.id}`}>

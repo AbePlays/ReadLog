@@ -16,15 +16,10 @@ test('has book details on the page', async ({ page }) => {
 
 test('has book details on the page for logged in user', async ({ login, page }) => {
   await login()
-  await page.goto('/library')
-
-  let booksList = page.getByRole('list', { name: 'Your ReadLog Library' })
-  let books = booksList.getByRole('listitem')
-  expect(await books.count()).toBe(0)
 
   await page.goto('/books')
-  booksList = page.getByRole('list', { name: 'Popular Books' })
-  books = booksList.getByRole('listitem')
+  const booksList = page.getByRole('list', { name: 'Popular Books' })
+  const books = booksList.getByRole('listitem')
   await books.first().click()
 
   // Check cancel functionality
@@ -48,7 +43,8 @@ test('has book details on the page for logged in user', async ({ login, page }) 
   await page.waitForResponse((res) => res.url().includes('books'))
 
   await page.goto('/library')
-  booksList = page.getByRole('list', { name: 'Your ReadLog Library' })
-  books = booksList.getByRole('listitem')
-  expect(await books.count()).toBe(1)
+
+  const tabPanel = page.getByRole('tabpanel')
+  await expect(tabPanel.getByRole('listitem')).toBeVisible()
+  expect(await tabPanel.getByRole('listitem').count()).toBe(1)
 })
