@@ -221,8 +221,8 @@ export default function BookRoute() {
               {hasTimerStarted
                 ? formatTime(time)
                 : hasNotRead
-                ? 'Start Reading'
-                : `Continue on Page ${currentPageNumber}`}
+                  ? 'Start Reading'
+                  : `Continue on Page ${currentPageNumber}`}
             </Button>
           </>
         ) : null}
