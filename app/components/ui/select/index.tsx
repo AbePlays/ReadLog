@@ -29,7 +29,12 @@ function SelectContent({ children, className, ...props }: React.ComponentProps<t
 }
 
 const SelectTrigger = React.forwardRef(function SelectTrigger(
-  { children, className, placeholder, ...props }: React.ComponentProps<typeof RadixSelect.Trigger>,
+  {
+    children,
+    className,
+    placeholder,
+    ...props
+  }: React.ComponentProps<typeof RadixSelect.Trigger> & { placeholder?: string },
   forwardedRef: React.Ref<HTMLButtonElement>
 ) {
   return (
