@@ -19,12 +19,15 @@ test('has books present for logged in user', async ({ addBook, login, page }) =>
   const { id } = await login()
   await page.goto('/library')
 
+  let tabPanel = page.getByRole('tabpanel')
+  await expect(tabPanel.getByRole('listitem')).not.toBeVisible()
   await expect(page.getByText('No Books Found')).toBeVisible()
 
   await addBook(id)
   await page.reload()
 
-  const tabPanel = page.getByRole('tabpanel')
+  tabPanel = page.getByRole('tabpanel')
   await expect(tabPanel.getByRole('listitem')).toBeVisible()
   expect(await tabPanel.getByRole('listitem').count()).toBe(1)
+  await expect(page.getByText('No Books Found')).not.toBeVisible()
 })
