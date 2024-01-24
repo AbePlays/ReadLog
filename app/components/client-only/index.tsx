@@ -7,7 +7,7 @@ function ClientOnly({ children }: { children: React.ReactNode }) {
     if (typeof window !== 'undefined') {
       setIsClient(true)
     }
-  }, [setIsClient])
+  }, [])
 
   return isClient ? children : null
 }
