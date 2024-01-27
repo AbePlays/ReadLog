@@ -6,14 +6,17 @@ import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
 import { Tabs } from '~/components/ui/tabs'
 import { getDbClient } from '~/libs/db/index.server'
-import { BookSchema } from '~/schemas/book'
+import { BookSchema, type TBook } from '~/schemas/book'
 import { getUserId } from '~/utils/session.server'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Library - ReadLog' }, { name: 'description', content: 'Your collection of books on ReadLog!' }]
 }
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
+export async function loader({
+  context,
+  request
+}: LoaderFunctionArgs): AsyncResult<(TBook & { readStatus: string })[], string> {
   const userId = await getUserId(request, context)
   if (!userId) {
     return redirect('/auth')
@@ -22,18 +25,23 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
   const xata = getDbClient(context)
   const userBooks = await xata.db.user_books.filter({ user_id: userId }).getAll()
 
-  const books = await Promise.all(
-    userBooks.map(async (userBook) => {
-      const response = await fetch(
-        `https://www.googleapis.com/books/v1/volumes/${userBook.book_id}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
-      )
-      const data = await response.json()
-      const book = BookSchema.parse(data)
-      return { ...book, readStatus: userBook.read_status }
-    })
-  )
+  try {
+    const books = await Promise.all(
+      userBooks.map(async (userBook) => {
+        const response = await fetch(
+          `https://www.googleapis.com/books/v1/volumes/${userBook.book_id}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
+        )
+        const data = await response.json()
+        const book = BookSchema.parse(data)
+        return { ...book, readStatus: userBook.read_status ?? '' }
+      })
+    )
 
-  return json(books)
+    return json({ ok: true, data: books })
+  } catch (e) {
+    console.error(e)
+    return json({ ok: false, error: 'An error occurred while fetching your library' })
+  }
 }
 
 export function shouldRevalidate(_: ShouldRevalidateFunctionArgs) {
@@ -72,7 +80,7 @@ export default function LibraryRoute() {
         </Tabs.List>
 
         {TABS.map((tab) => {
-          const books = loaderData.filter((book) => book.readStatus === tab.id)
+          const books = loaderData.ok ? loaderData.data.filter((book) => book.readStatus === tab.id) : []
 
           return (
             <Tabs.Content key={tab.id} value={tab.id}>

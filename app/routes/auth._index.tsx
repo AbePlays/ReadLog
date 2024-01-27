@@ -21,12 +21,23 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
+export async function loader({ context, request }: LoaderFunctionArgs): AsyncResult<string | undefined> {
   const userId = await getUserId(request, context)
-  return { userId }
+  return json({ ok: true, data: userId })
 }
 
-export async function action({ context, request }: ActionFunctionArgs) {
+type ActionResponse = {
+  fields: { [k: string]: FormDataEntryValue }
+  errors: {
+    confirmPassword: string
+    email: string
+    form: string
+    fullname: string
+    password: string
+  }
+}
+
+export async function action({ context, request }: ActionFunctionArgs): AsyncResult<ActionResponse> {
   const fields = Object.fromEntries(await request.formData())
 
   const { commitSession, getSession } = getUserSessionStorage(context)
@@ -35,54 +46,86 @@ export async function action({ context, request }: ActionFunctionArgs) {
   if (fields.authType === 'signin') {
     const result = signinSchema.safeParse(fields)
     if (!result.success) {
+      const errors = result.error.format()
       return json(
-        { fields, errors: { ...result.error.flatten().fieldErrors, fullname: '', confirmPassword: '', form: '' } },
+        {
+          ok: true,
+          data: {
+            fields,
+            errors: {
+              confirmPassword: '',
+              form: '',
+              fullname: '',
+              email: errors.email?._errors[0] ?? '',
+              password: errors.password?._errors[0] ?? ''
+            }
+          }
+        },
         { status: 400 }
       )
     }
 
     const data = await signin(result.data, context)
     if (data.error) {
-      return json(data, { status: 400 })
+      return json({ ok: true, data }, { status: 400 })
     }
 
     session.set('userId', data.user.id)
-    return redirect('/', {
-      headers: {
-        'Set-Cookie': await commitSession(session)
-      }
-    })
+    return redirect('/', { headers: { 'Set-Cookie': await commitSession(session) } })
   }
 
   if (fields.authType === 'signup') {
     const result = signupSchema.safeParse(fields)
     if (!result.success) {
-      return json({ fields, errors: { ...result.error.flatten().fieldErrors, form: '' } }, { status: 400 })
+      const errors = result.error.format()
+      return json(
+        {
+          ok: true,
+          data: {
+            fields,
+            errors: {
+              confirmPassword: errors.confirmPassword?._errors[0] ?? '',
+              email: errors.email?._errors[0] ?? '',
+              form: '',
+              fullname: errors.fullname?._errors[0] ?? '',
+              password: errors.password?._errors[0] ?? ''
+            }
+          }
+        },
+        { status: 400 }
+      )
     }
 
     const data = await signup(result.data, context)
-
     if (data.error) {
-      return json(data, { status: 400 })
+      return json({ ok: true, data }, { status: 400 })
     }
 
     session.set('userId', data.user.id)
-    return redirect('/', {
-      headers: {
-        'Set-Cookie': await commitSession(session)
-      }
-    })
+    return redirect('/', { headers: { 'Set-Cookie': await commitSession(session) } })
   }
 
   return json(
-    { fields, errors: { email: '', password: '', fullname: '', confirmPassword: '', form: 'Invalid form submission' } },
+    {
+      ok: true,
+      data: {
+        fields,
+        errors: {
+          confirmPassword: '',
+          email: '',
+          form: 'Invalid form submission',
+          fullname: '',
+          password: ''
+        }
+      }
+    },
     { status: 400 }
   )
 }
 
 export default function AuthRoute() {
   const actionData = useActionData<typeof action>()
-  const loaderData = useLoaderData<typeof loader>()
+  const { data: userId } = useLoaderData<typeof loader>()
   const { search } = useLocation()
   const { state } = useNavigation()
   const [searchParams] = useSearchParams()
@@ -91,7 +134,7 @@ export default function AuthRoute() {
 
   return (
     <div className="max-w-screen-sm mx-auto">
-      {loaderData.userId ? (
+      {userId ? (
         <div>
           <span>You're logged in</span>
           <Form action="/signout" aria-label="sign out form" method="post">
@@ -122,15 +165,15 @@ export default function AuthRoute() {
                   </label>
                   <TextField.Root>
                     <TextField.Input
-                      aria-describedby={actionData?.errors.fullname ? 'fullname-error' : undefined}
-                      aria-invalid={!!actionData?.errors.fullname}
+                      aria-describedby={actionData?.data.errors.fullname ? 'fullname-error' : undefined}
+                      aria-invalid={!!actionData?.data.errors.fullname}
                       id="fullname"
                       name="fullname"
                     />
                   </TextField.Root>
-                  {actionData?.errors.fullname ? (
+                  {actionData?.data.errors.fullname ? (
                     <p className="text-red-500" id="fullname-error" role="alert">
-                      {actionData.errors.fullname}
+                      {actionData.data.errors.fullname}
                     </p>
                   ) : null}
                 </div>
@@ -142,16 +185,16 @@ export default function AuthRoute() {
                 </label>
                 <TextField.Root>
                   <TextField.Input
-                    aria-describedby={actionData?.errors.email ? 'email-error' : undefined}
-                    aria-invalid={!!actionData?.errors.email}
+                    aria-describedby={actionData?.data.errors.email ? 'email-error' : undefined}
+                    aria-invalid={!!actionData?.data.errors.email}
                     id="email"
                     name="email"
                     type="email"
                   />
                 </TextField.Root>
-                {actionData?.errors.email ? (
+                {actionData?.data.errors.email ? (
                   <p className="text-red-500" id="email-error" role="alert">
-                    {actionData.errors.email}
+                    {actionData.data.errors.email}
                   </p>
                 ) : null}
               </div>
@@ -162,16 +205,16 @@ export default function AuthRoute() {
                 </label>
                 <TextField.Root>
                   <TextField.Input
-                    aria-describedby={actionData?.errors.password ? 'password-error' : undefined}
-                    aria-invalid={!!actionData?.errors.password}
+                    aria-describedby={actionData?.data.errors.password ? 'password-error' : undefined}
+                    aria-invalid={!!actionData?.data.errors.password}
                     id="password"
                     name="password"
                     type="password"
                   />
                 </TextField.Root>
-                {actionData?.errors.password ? (
+                {actionData?.data.errors.password ? (
                   <p className="text-red-500" id="password-error" role="alert">
-                    {actionData.errors.password}
+                    {actionData.data.errors.password}
                   </p>
                 ) : null}
               </div>
@@ -183,24 +226,24 @@ export default function AuthRoute() {
                   </label>
                   <TextField.Root>
                     <TextField.Input
-                      aria-describedby={actionData?.errors.confirmPassword ? 'confirmPassword-error' : undefined}
-                      aria-invalid={!!actionData?.errors.confirmPassword}
+                      aria-describedby={actionData?.data.errors.confirmPassword ? 'confirmPassword-error' : undefined}
+                      aria-invalid={!!actionData?.data.errors.confirmPassword}
                       id="confirmPassword"
                       name="confirmPassword"
                       type="password"
                     />
                   </TextField.Root>
-                  {actionData?.errors.confirmPassword ? (
+                  {actionData?.data.errors.confirmPassword ? (
                     <p className="text-red-500" id="confirmPassword-error" role="alert">
-                      {actionData.errors.confirmPassword}
+                      {actionData.data.errors.confirmPassword}
                     </p>
                   ) : null}
                 </div>
               ) : null}
 
-              {actionData?.errors.form ? (
+              {actionData?.data.errors.form ? (
                 <p className="text-red-500" role="alert">
-                  {actionData.errors.form}
+                  {actionData.data.errors.form}
                 </p>
               ) : null}
 

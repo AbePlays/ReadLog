@@ -1,4 +1,4 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
+import { type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
 import { Form, useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 import { Book, MoveLeft, MoveRight, Search, SearchX } from 'lucide-react'
 
@@ -8,7 +8,7 @@ import { Button } from '~/components/ui/button'
 import { Link } from '~/components/ui/link'
 import { Select } from '~/components/ui/select'
 import { TextField } from '~/components/ui/text-field'
-import { BooksSchema } from '~/schemas/book'
+import { BooksSchema, type TBookSearchResponse } from '~/schemas/book'
 import { cn } from '~/utils/cn'
 
 export const meta: MetaFunction = () => {
@@ -18,7 +18,7 @@ export const meta: MetaFunction = () => {
   ]
 }
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
+export async function loader({ context, request }: LoaderFunctionArgs): AsyncResult<TBookSearchResponse, string> {
   const url = new URL(request.url)
 
   const query = url.searchParams.get('q')
@@ -26,15 +26,20 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
   const page = (Number(url.searchParams.get('page') ?? '1') - 1) * 10
 
   if (query) {
-    const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes?q=intitle:${query},subject:${genre}&startIndex=${page}&maxResults=10&key=${context.env.GOOGLE_BOOKS_API_KEY}`
-    )
-    const data = await response.json()
-    const books = BooksSchema.parse(data)
-    return books
+    try {
+      const response = await fetch(
+        `https://www.googleapis.com/books/v1/volumes?q=intitle:${query},subject:${genre}&startIndex=${page}&maxResults=10&key=${context.env.GOOGLE_BOOKS_API_KEY}`
+      )
+      const data = await response.json()
+      const books = BooksSchema.parse(data)
+      return json({ ok: true, data: books })
+    } catch (e) {
+      console.error(e)
+      return json({ ok: false, error: 'An error occurred while searching for books' })
+    }
   }
 
-  return null
+  return json({ ok: true, data: { kind: '', totalItems: 0, items: [] } })
 }
 
 export default function SearchRoute() {
@@ -49,7 +54,7 @@ export default function SearchRoute() {
 
   const pagination = {
     isPreviousDisabled: page === 1,
-    isNextDisabled: (loaderData?.items?.length ?? 0) < 10
+    isNextDisabled: loaderData.ok ? loaderData.data.items.length < 10 : true
   }
 
   return (
@@ -86,15 +91,15 @@ export default function SearchRoute() {
         </div>
       </Form>
 
-      {loaderData ? (
+      {query && loaderData.ok ? (
         <>
-          {(loaderData.items?.length ?? 0) > 0 ? (
+          {loaderData.data.items.length > 0 ? (
             <div className={cn({ 'pointer-events-none opacity-30': isLoadingBooks })}>
               <ul
                 aria-label="Search Results"
                 className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
               >
-                {loaderData.items?.map((book) => {
+                {loaderData.data.items.map((book) => {
                   return (
                     <li className="w-full" key={book.id}>
                       <Link className="block rounded-lg h-full" to={`/books/${book.id}`}>

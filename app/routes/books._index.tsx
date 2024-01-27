@@ -1,10 +1,10 @@
-import type { LoaderFunctionArgs, MetaFunction } from '@remix-run/cloudflare'
+import { type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
 import { useLoaderData, useNavigation, useSearchParams } from '@remix-run/react'
 
 import { BookCover } from '~/components/book-cover'
 import { Link } from '~/components/ui/link'
 import { ToggleGroup } from '~/components/ui/toggle-group'
-import { BooksSchema } from '~/schemas/book'
+import { BooksSchema, type TBookSearchResponse } from '~/schemas/book'
 import { cn } from '~/utils/cn'
 
 export const meta: MetaFunction = () => {
@@ -20,7 +20,7 @@ export const meta: MetaFunction = () => {
 const ALL_GENRES = 'all genres'
 const GENRES = ['fiction', 'nonfiction', 'mystery', 'science', 'fantasy']
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
+export async function loader({ context, request }: LoaderFunctionArgs): AsyncResult<TBookSearchResponse, string> {
   const url = new URL(request.url)
   let genres = url.searchParams.get('genre') ?? ALL_GENRES
 
@@ -28,12 +28,17 @@ export async function loader({ context, request }: LoaderFunctionArgs) {
     genres = GENRES.map((genre) => `'${genre}'`).join(',')
   }
 
-  const res = await fetch(
-    `https://www.googleapis.com/books/v1/volumes?q=subject:${genres}&orderBy=relevance&key=${context.env.GOOGLE_BOOKS_API_KEY}`
-  )
-  const data = await res.json()
-  const books = BooksSchema.parse(data)
-  return books
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/books/v1/volumes?q=subject:${genres}&orderBy=relevance&key=${context.env.GOOGLE_BOOKS_API_KEY}`
+    )
+    const data = await res.json()
+    const books = BooksSchema.parse(data)
+    return json({ ok: true, data: books })
+  } catch (e) {
+    console.error(e)
+    return json({ ok: false, error: 'An error occurred while fetching books' })
+  }
 }
 
 export default function BooksRoute() {
@@ -63,13 +68,13 @@ export default function BooksRoute() {
         ))}
       </ToggleGroup>
 
-      {loaderData ? (
+      {loaderData.ok ? (
         <div className={cn({ 'pointer-events-none opacity-30': isLoadingBooks })}>
           <ul
             aria-labelledby="popular-books"
             className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6"
           >
-            {loaderData.items?.map((book) => {
+            {loaderData.data.items.map((book) => {
               return (
                 <li className="w-full" key={book.id}>
                   <Link className="block rounded-lg h-full" to={`./${book.id}`}>
