@@ -11,15 +11,16 @@ import { Button } from '~/components/ui/button'
 import { Modal } from '~/components/ui/modal'
 import { TextField } from '~/components/ui/text-field'
 import { getDbClient } from '~/libs/db/index.server'
-import { BookDetailSchema } from '~/schemas/book'
+import type { UserBooksRecord } from '~/libs/db/xata.server'
+import { BookDetailSchema, type TBook } from '~/schemas/book'
 import { formatTime } from '~/utils/formatTime'
 import { getUserId } from '~/utils/session.server'
 
-export const meta: MetaFunction<typeof loader> = ({ data }) => {
-  if (data) {
-    const match = data.bookDetails.volumeInfo.description?.match(/[^.!?]+[.!?]+\s/)
-    const description = match ? match[0].trim() : data.bookDetails.volumeInfo.description ?? ''
-    return [{ title: data.bookDetails.volumeInfo.title }, { name: 'description', content: description }]
+export const meta: MetaFunction<typeof loader> = ({ data: loaderData }) => {
+  if (loaderData) {
+    const match = loaderData.data.bookDetails.volumeInfo.description?.match(/[^.!?]+[.!?]+\s/)
+    const description = match ? match[0].trim() : loaderData.data.bookDetails.volumeInfo.description ?? ''
+    return [{ title: loaderData.data.bookDetails.volumeInfo.title }, { name: 'description', content: description }]
   }
 
   return [
@@ -28,31 +29,39 @@ export const meta: MetaFunction<typeof loader> = ({ data }) => {
   ]
 }
 
-export async function loader({ context, params, request }: LoaderFunctionArgs) {
+export async function loader({ context, params, request }: LoaderFunctionArgs): AsyncResult<{
+  bookDetails: TBook
+  userDetails: { userId: string | undefined; userBook: UserBooksRecord | null }
+}> {
   const xata = getDbClient(context)
   const userId = await getUserId(request, context)
 
-  const bookId = z.string().parse(params.bookId)
-  const response = await fetch(
-    `https://www.googleapis.com/books/v1/volumes/${bookId}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
-  )
-  const data = await response.json()
-  const bookDetails = BookDetailSchema.parse(data)
+  try {
+    const bookId = z.string().parse(params.bookId)
+    const response = await fetch(
+      `https://www.googleapis.com/books/v1/volumes/${bookId}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
+    )
+    const data = await response.json()
+    const bookDetails = BookDetailSchema.parse(data)
 
-  let userBook = null
-  if (userId) {
-    const book = await xata.db.user_books.filter({ book_id: bookId, user_id: userId }).getFirst()
-    userBook = book
+    let userBook = null
+    if (userId) {
+      const book = await xata.db.user_books.filter({ book_id: bookId, user_id: userId }).getFirst()
+      userBook = book
+    }
+    return json({ ok: true, data: { bookDetails, userDetails: { userId, userBook } } })
+  } catch (e) {
+    console.error(e)
+    throw json('An error occurred while fetching the book', { status: 500 })
   }
-  return { bookDetails, userDetails: { userId, userBook } }
 }
 
-export async function action({ context, request }: ActionFunctionArgs) {
+export async function action({ context, request }: ActionFunctionArgs): AsyncResult<UserBooksRecord, string> {
   const userId = await getUserId(request, context)
 
   if (!userId) {
     return json(
-      { success: false, error: 'User ID is missing or invalid. Please provide a valid user ID and try again.' },
+      { ok: false, error: 'User ID is missing or invalid. Please provide a valid user ID and try again.' },
       { status: 400 }
     )
   }
@@ -69,7 +78,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     .safeParse(fields)
 
   if (!result.success) {
-    return json({ success: false, error: 'Invalid request. Please check your input and try again.' }, { status: 400 })
+    return json({ ok: false, error: 'Invalid request. Please check your input and try again.' }, { status: 400 })
   }
 
   const xata = getDbClient(context)
@@ -77,19 +86,13 @@ export async function action({ context, request }: ActionFunctionArgs) {
     let record = await xata.db.user_books.filter({ id: result.data.userBookId, user_id: userId }).getFirst()
 
     if (!record) {
-      return json(
-        { success: false, error: 'Record not found. Please check your input and try again.' },
-        { status: 404 }
-      )
+      return json({ ok: false, error: 'Record not found. Please check your input and try again.' }, { status: 404 })
     }
 
     const history = record.reading_history
 
     if (history.length > 0 && result.data.pageNumber < history[0].page_end) {
-      return json(
-        { success: false, error: 'Invalid page number. Please check your input and try again.' },
-        { status: 400 }
-      )
+      return json({ ok: false, error: 'Invalid page number. Please check your input and try again.' }, { status: 400 })
     }
 
     record = await xata.db.user_books.update(result.data.userBookId, {
@@ -106,10 +109,10 @@ export async function action({ context, request }: ActionFunctionArgs) {
     })
 
     if (!record) {
-      return json({ success: false, error: 'Failed to update the record. Please try again later.' }, { status: 404 })
+      return json({ ok: false, error: 'Failed to update the record. Please try again later.' }, { status: 404 })
     }
 
-    return { success: true, data: record }
+    return json({ ok: true, data: record })
   }
 
   const record = await xata.db.user_books.create({
@@ -129,7 +132,7 @@ export async function action({ context, request }: ActionFunctionArgs) {
     user_id: userId
   })
 
-  return { success: true, data: record }
+  return json({ ok: true, data: record })
 }
 
 export default function BookRoute() {
@@ -140,13 +143,13 @@ export default function BookRoute() {
   const { pause, reset, start, status, time } = useTimer()
 
   const hasTimerStarted = status === 'RUNNING'
-  const hasNotRead = !loaderData.userDetails.userBook
-  const currentPageNumber = loaderData.userDetails.userBook?.reading_history[0]?.page_end || 0
-  const completionPercentage = (currentPageNumber * 100) / (loaderData.bookDetails.volumeInfo.pageCount || 1)
+  const hasNotRead = !loaderData.data.userDetails.userBook
+  const currentPageNumber = loaderData.data.userDetails.userBook?.reading_history[0]?.page_end || 0
+  const completionPercentage = (currentPageNumber * 100) / (loaderData.data.bookDetails.volumeInfo.pageCount || 1)
 
   useEffect(() => {
     // Close dialog if the form is successfully submitted
-    if (actionData?.success) {
+    if (actionData?.ok) {
       setShowModal(false)
     }
   }, [actionData])
@@ -167,40 +170,40 @@ export default function BookRoute() {
         <BackButton className="mt-4 rounded-full" />
         <div className="p-8 bg-stone-50">
           <img
-            alt={`Cover of a book titled ${loaderData.bookDetails.volumeInfo.title}`}
+            alt={`Cover of a book titled ${loaderData.data.bookDetails.volumeInfo.title}`}
             className="aspect-[2/3]"
             height="300"
-            src={loaderData.bookDetails.volumeInfo.imageLinks?.thumbnail}
+            src={loaderData.data.bookDetails.volumeInfo.imageLinks?.thumbnail}
             width="200"
           />
         </div>
       </div>
       <div className="grid gap-2 mt-8">
-        <h1 className="font-medium text-xl">{loaderData.bookDetails.volumeInfo.title}</h1>
+        <h1 className="font-medium text-xl">{loaderData.data.bookDetails.volumeInfo.title}</h1>
         <span className="block text-gray-600">
-          {new Intl.ListFormat().format(loaderData.bookDetails.volumeInfo.authors ?? [])}
+          {new Intl.ListFormat().format(loaderData.data.bookDetails.volumeInfo.authors ?? [])}
         </span>
 
-        {loaderData.bookDetails.volumeInfo.publishedDate ? (
+        {loaderData.data.bookDetails.volumeInfo.publishedDate ? (
           <span className="flex text-sm gap-2 text-gray-600 leading-none">
             <PenBox aria-hidden="true" size={14} />
             <span>
-              <time dateTime={loaderData.bookDetails.volumeInfo.publishedDate} suppressHydrationWarning>
-                {new Intl.DateTimeFormat().format(new Date(loaderData.bookDetails.volumeInfo.publishedDate))}
+              <time dateTime={loaderData.data.bookDetails.volumeInfo.publishedDate} suppressHydrationWarning>
+                {new Intl.DateTimeFormat().format(new Date(loaderData.data.bookDetails.volumeInfo.publishedDate))}
               </time>{' '}
               (First Published)
             </span>
           </span>
         ) : null}
 
-        {loaderData.bookDetails.volumeInfo.pageCount ? (
+        {loaderData.data.bookDetails.volumeInfo.pageCount ? (
           <span className="flex text-sm gap-2 text-gray-600 leading-none">
             <BookText aria-hidden="true" size={14} />
-            {new Intl.NumberFormat().format(loaderData.bookDetails.volumeInfo.pageCount)} Pages
+            {new Intl.NumberFormat().format(loaderData.data.bookDetails.volumeInfo.pageCount)} Pages
           </span>
         ) : null}
 
-        {loaderData.userDetails.userId ? (
+        {loaderData.data.userDetails.userId ? (
           <>
             <div
               className="mt-2 bg-gray-200 rounded-lg overflow-hidden h-2 relative before:absolute before:inset-0 before:bg-black before:transition-[width] before:w-[--progress-width]"
@@ -234,7 +237,7 @@ export default function BookRoute() {
           <p
             className="text-gray-600 text-sm prose max-w-none"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: santized by google books
-            dangerouslySetInnerHTML={{ __html: loaderData.bookDetails.volumeInfo.description ?? '' }}
+            dangerouslySetInnerHTML={{ __html: loaderData.data.bookDetails.volumeInfo.description ?? '' }}
           />
         </ClientOnly>
       </div>
@@ -246,20 +249,25 @@ export default function BookRoute() {
 
             <Form method="post">
               <fieldset disabled={state !== 'idle'}>
-                <input name="bookId" type="hidden" value={loaderData.bookDetails.id} />
-                <input name="bookName" type="hidden" value={loaderData.bookDetails.volumeInfo.title} />
+                <input name="bookId" type="hidden" value={loaderData.data.bookDetails.id} />
+                <input name="bookName" type="hidden" value={loaderData.data.bookDetails.volumeInfo.title} />
                 <input
                   name="imageUrl"
                   type="hidden"
-                  value={loaderData.bookDetails.volumeInfo.imageLinks?.smallThumbnail}
+                  value={loaderData.data.bookDetails.volumeInfo.imageLinks?.smallThumbnail}
                 />
-                <input name="userBookId" readOnly type="hidden" value={loaderData.userDetails.userBook?.id ?? ''} />
+                <input
+                  name="userBookId"
+                  readOnly
+                  type="hidden"
+                  value={loaderData.data.userDetails.userBook?.id ?? ''}
+                />
                 <input name="timeSpent" readOnly type="hidden" value={time} />
 
                 <label htmlFor="pageNumber">Page Number</label>
                 <TextField.Root className="mt-2">
                   <TextField.Input
-                    defaultValue={loaderData.userDetails.userBook?.reading_history[0]?.page_end}
+                    defaultValue={loaderData.data.userDetails.userBook?.reading_history[0]?.page_end}
                     id="pageNumber"
                     name="pageNumber"
                     type="number"

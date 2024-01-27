@@ -1,4 +1,4 @@
-import type { LinksFunction, LoaderFunctionArgs } from '@remix-run/cloudflare'
+import { type LinksFunction, type LoaderFunctionArgs, json } from '@remix-run/cloudflare'
 import {
   Links,
   LiveReload,
@@ -11,7 +11,7 @@ import {
   useRouteError
 } from '@remix-run/react'
 import { Menu } from 'lucide-react'
-import { useState } from 'react'
+import React from 'react'
 
 import { Navigation } from '~/components/navigation'
 import { IconButton } from '~/components/ui/icon-button'
@@ -24,14 +24,15 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: tailwind }
 ]
 
-export async function loader({ context, request }: LoaderFunctionArgs) {
+export async function loader({ context, request }: LoaderFunctionArgs): AsyncResult<string | undefined> {
   const userId = await getUserId(request, context)
-  return { userId }
+  return json({ ok: true, data: userId })
 }
 
 export default function App() {
-  const { userId } = useLoaderData<typeof loader>()
-  const [showNav, setShowNav] = useState(false)
+  const { data: userId } = useLoaderData<typeof loader>()
+
+  const [showNav, setShowNav] = React.useState(false)
 
   return (
     <html lang="en">
@@ -80,13 +81,13 @@ export default function App() {
 }
 
 export function ErrorBoundary() {
-  const error = useRouteError()
-  console.error(error)
+  const routeError = useRouteError()
+  console.error(routeError)
 
   let errorMessage = 'Something went wrong'
 
-  if (isRouteErrorResponse(error) && error.data) {
-    errorMessage = error.data
+  if (isRouteErrorResponse(routeError) && routeError.data.error) {
+    errorMessage = routeError.data.error
   }
 
   return (
@@ -98,7 +99,7 @@ export function ErrorBoundary() {
         <Meta />
         <Links />
       </head>
-      <body>
+      <body className="p-4">
         <h1 className="font-bold text-2xl">{errorMessage}</h1>
         <p>
           Please raise an issue on the project's{' '}
