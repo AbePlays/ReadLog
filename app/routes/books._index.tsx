@@ -34,7 +34,7 @@ export async function loader({ context, request }: LoaderFunctionArgs): AsyncRes
     )
     const data = await res.json()
     const books = BooksSchema.parse(data)
-    return json({ ok: true, data: books })
+    return json({ ok: true, data: books }, { headers: { 'Cache-Control': 'public, max-age=86400' } })
   } catch (e) {
     console.error(e)
     return json({ ok: false, error: 'An error occurred while fetching books' })
@@ -77,7 +77,7 @@ export default function BooksRoute() {
             {loaderData.data.items.map((book) => {
               return (
                 <li className="w-full" key={book.id}>
-                  <Link className="block rounded-lg h-full" to={`./${book.id}`}>
+                  <Link className="block rounded-lg h-full" prefetch="intent" to={`./${book.id}`}>
                     <BookCover book={book} />
                   </Link>
                 </li>

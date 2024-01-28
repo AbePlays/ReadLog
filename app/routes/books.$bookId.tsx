@@ -38,17 +38,13 @@ export async function loader({ context, params, request }: LoaderFunctionArgs): 
 
   try {
     const bookId = z.string().parse(params.bookId)
-    const response = await fetch(
-      `https://www.googleapis.com/books/v1/volumes/${bookId}?key=${context.env.GOOGLE_BOOKS_API_KEY}`
-    )
-    const data = await response.json()
+    const [data, userBook] = await Promise.all([
+      fetch(`https://www.googleapis.com/books/v1/volumes/${bookId}?key=${context.env.GOOGLE_BOOKS_API_KEY}`).then(
+        (res) => res.json()
+      ),
+      userId ? xata.db.user_books.filter({ book_id: bookId, user_id: userId }).getFirst() : null
+    ])
     const bookDetails = BookDetailSchema.parse(data)
-
-    let userBook = null
-    if (userId) {
-      const book = await xata.db.user_books.filter({ book_id: bookId, user_id: userId }).getFirst()
-      userBook = book
-    }
     return json({ ok: true, data: { bookDetails, userDetails: { userId, userBook } } })
   } catch (e) {
     console.error(e)
@@ -165,7 +161,7 @@ export default function BookRoute() {
   }
 
   return (
-    <div className="max-w-screen-sm mx-auto">
+    <div className="max-w-screen-md mx-auto">
       <div className="flex justify-between items-start">
         <BackButton className="mt-4 rounded-full" />
         <div className="p-8 bg-stone-50">
@@ -179,14 +175,14 @@ export default function BookRoute() {
         </div>
       </div>
       <div className="grid gap-2 mt-8">
-        <h1 className="font-medium text-xl">{loaderData.data.bookDetails.volumeInfo.title}</h1>
-        <span className="block text-gray-600">
+        <h1 className="font-medium text-2xl">{loaderData.data.bookDetails.volumeInfo.title}</h1>
+        <span className="block text-gray-600 text-lg">
           {new Intl.ListFormat().format(loaderData.data.bookDetails.volumeInfo.authors ?? [])}
         </span>
 
         {loaderData.data.bookDetails.volumeInfo.publishedDate ? (
-          <span className="flex text-sm gap-2 text-gray-600 leading-none">
-            <PenBox aria-hidden="true" size={14} />
+          <span className="flex gap-2 text-gray-600 leading-none">
+            <PenBox aria-hidden="true" size={16} />
             <span>
               <time dateTime={loaderData.data.bookDetails.volumeInfo.publishedDate} suppressHydrationWarning>
                 {new Intl.DateTimeFormat().format(new Date(loaderData.data.bookDetails.volumeInfo.publishedDate))}
@@ -197,8 +193,8 @@ export default function BookRoute() {
         ) : null}
 
         {loaderData.data.bookDetails.volumeInfo.pageCount ? (
-          <span className="flex text-sm gap-2 text-gray-600 leading-none">
-            <BookText aria-hidden="true" size={14} />
+          <span className="flex gap-2 text-gray-600 leading-none">
+            <BookText aria-hidden="true" size={16} />
             {new Intl.NumberFormat().format(loaderData.data.bookDetails.volumeInfo.pageCount)} Pages
           </span>
         ) : null}
@@ -216,9 +212,7 @@ export default function BookRoute() {
                 {completionPercentage}%
               </progress>
             </div>
-            <span className="text-right block text-sm text-gray-400">
-              {Math.floor(completionPercentage)}% Completed
-            </span>
+            <span className="text-right block text-gray-400">{Math.floor(completionPercentage)}% Completed</span>
 
             <Button className="tabular-nums" onClick={handleTimer} variant="solid">
               {hasTimerStarted
@@ -233,9 +227,9 @@ export default function BookRoute() {
         <hr className="mt-4 b-0 h-0.5 bg-gray-200 rounded-full" />
 
         <ClientOnly>
-          <span className="mt-2 font-medium text-lg">Synopsis</span>
+          <span className="mt-2 font-medium text-xl">Synopsis</span>
           <p
-            className="text-gray-600 text-sm prose max-w-none"
+            className="text-gray-600 prose max-w-none"
             // biome-ignore lint/security/noDangerouslySetInnerHtml: santized by google books
             dangerouslySetInnerHTML={{ __html: loaderData.data.bookDetails.volumeInfo.description ?? '' }}
           />
