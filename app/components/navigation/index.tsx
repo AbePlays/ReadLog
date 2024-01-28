@@ -18,7 +18,7 @@ function Navigation({
           </NavItem>
         </li>
         <li>
-          <NavItem onClick={closeNav} to="/books">
+          <NavItem onClick={closeNav} prefetch="intent" to="/books">
             <Book aria-hidden="true" size={16} />
             Books
           </NavItem>
