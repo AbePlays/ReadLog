@@ -32,7 +32,7 @@ export async function loader({ context, request }: LoaderFunctionArgs): AsyncRes
       )
       const data = await response.json()
       const books = BooksSchema.parse(data)
-      return json({ ok: true, data: books })
+      return json({ ok: true, data: books }, { headers: { 'Cache-Control': 'public, max-age=86400' } })
     } catch (e) {
       console.error(e)
       return json({ ok: false, error: 'An error occurred while searching for books' })
