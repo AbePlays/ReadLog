@@ -138,6 +138,7 @@ export default function AuthRoute() {
         <div>
           <span>You're logged in</span>
           <Form action="/signout" aria-label="sign out form" method="post">
+            <input type="hidden" name="authType" value="signout" />
             <Button type="submit" variant="solid">
               Logout
             </Button>

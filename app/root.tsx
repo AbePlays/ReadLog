@@ -6,6 +6,7 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  type ShouldRevalidateFunctionArgs,
   isRouteErrorResponse,
   useLoaderData,
   useRouteError
@@ -27,6 +28,10 @@ export const links: LinksFunction = () => [
 export async function loader({ context, request }: LoaderFunctionArgs): AsyncResult<string | undefined> {
   const userId = await getUserId(request, context)
   return json({ ok: true, data: userId })
+}
+
+export function shouldRevalidate({ formData = new FormData() }: ShouldRevalidateFunctionArgs) {
+  return Boolean(formData.get('authType'))
 }
 
 export default function App() {
