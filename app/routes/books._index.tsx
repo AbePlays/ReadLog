@@ -63,7 +63,9 @@ export default function BooksRoute() {
       >
         {[ALL_GENRES, ...GENRES.sort()].map((genre) => (
           <ToggleGroup.Item asChild className="capitalize" key={genre} value={genre}>
-            <Link to={`?genre=${genre}`}>{genre}</Link>
+            <Link prefetch="intent" to={`?genre=${genre}`}>
+              {genre}
+            </Link>
           </ToggleGroup.Item>
         ))}
       </ToggleGroup>
