@@ -94,7 +94,7 @@ export default function LibraryRoute() {
                 <ul className="grid grid-cols-[repeat(auto-fill,minmax(250px,1fr))] justify-items-center gap-x-12 gap-y-8 p-6">
                   {books.map((book) => (
                     <li className="w-full" key={book.id}>
-                      <Link className="block rounded-lg h-full" to={`/books/${book.id}`}>
+                      <Link className="block rounded-lg h-full" prefetch="intent" to={`/books/${book.id}`}>
                         <BookCover book={book} />
                       </Link>
                     </li>

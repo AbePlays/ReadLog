@@ -102,7 +102,7 @@ export default function SearchRoute() {
                 {loaderData.data.items.map((book) => {
                   return (
                     <li className="w-full" key={book.id}>
-                      <Link className="block rounded-lg h-full" to={`/books/${book.id}`}>
+                      <Link className="block rounded-lg h-full" prefetch="intent" to={`/books/${book.id}`}>
                         <BookCover book={book} />
                       </Link>
                     </li>
@@ -116,6 +116,7 @@ export default function SearchRoute() {
                   aria-label={`Go to Page ${page - 1}`}
                   className={cn({ 'pointer-events-none opacity-30': pagination.isPreviousDisabled })}
                   disabled={pagination.isPreviousDisabled}
+                  prefetch="intent"
                   to={`/search?q=${query}&genre=${genre}&page=${page - 1}`}
                 >
                   <MoveLeft size={20} />
@@ -131,6 +132,7 @@ export default function SearchRoute() {
                   aria-label={`Go to Page ${page + 1}`}
                   className={cn({ 'pointer-events-none opacity-30': pagination.isNextDisabled })}
                   disabled={pagination.isNextDisabled}
+                  prefetch="intent"
                   to={`/search?q=${query}&genre=${genre}&page=${page + 1}`}
                 >
                   <MoveRight size={20} />
