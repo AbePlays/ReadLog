@@ -127,9 +127,10 @@ test('signs up, signs out and signs back in', async ({ page }) => {
   submitButton = form.getByRole('button', { name: 'Logout' })
   await submitButton.click()
 
-  await page.waitForURL('/auth')
+  await page.waitForURL('/')
 
   // Sign in
+  await page.goto('/auth')
   form = page.getByRole('form', { name: 'sign in form' })
   await expect(form).toBeVisible()
 
