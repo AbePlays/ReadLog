@@ -167,7 +167,7 @@ export default function BookRoute() {
         <div className="p-8 bg-stone-50">
           <img
             alt={`Cover of a book titled ${loaderData.data.bookDetails.volumeInfo.title}`}
-            className="aspect-[2/3]"
+            className="aspect-[2/3] [view-transition-name:book-cover]"
             height="300"
             src={loaderData.data.bookDetails.volumeInfo.imageLinks?.thumbnail}
             width="200"
