@@ -79,7 +79,12 @@ export default function BooksRoute() {
             {loaderData.data.items.map((book) => {
               return (
                 <li className="w-full" key={book.id}>
-                  <Link className="block rounded-lg h-full" prefetch="intent" to={`./${book.id}`}>
+                  <Link
+                    className="block rounded-lg h-full"
+                    prefetch="intent"
+                    to={`./${book.id}`}
+                    unstable_viewTransition
+                  >
                     <BookCover book={book} />
                   </Link>
                 </li>
