@@ -1,11 +1,6 @@
-import {
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
-  type MetaFunction,
-  json,
-  redirect
-} from '@remix-run/cloudflare'
+import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, json } from '@remix-run/cloudflare'
 import { Form, useActionData, useLoaderData, useLocation, useNavigation, useSearchParams } from '@remix-run/react'
+import { redirectWithSuccess } from 'remix-toast'
 
 import { Button } from '~/components/ui/button'
 import { Link } from '~/components/ui/link'
@@ -70,8 +65,12 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       return json({ ok: true, data }, { status: 400 })
     }
 
+    const firstName = data.user.fullname?.split(' ')[0] ?? ''
+
     session.set('userId', data.user.id)
-    return redirect('/', { headers: { 'Set-Cookie': await commitSession(session) } })
+    return redirectWithSuccess('/', `Welcome back ${firstName}!`, {
+      headers: { 'Set-Cookie': await commitSession(session) }
+    })
   }
 
   if (fields.authType === 'signup') {
@@ -102,7 +101,9 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
     }
 
     session.set('userId', data.user.id)
-    return redirect('/', { headers: { 'Set-Cookie': await commitSession(session) } })
+    return redirectWithSuccess('/', "You're in! Get ready to explore Readlog.", {
+      headers: { 'Set-Cookie': await commitSession(session) }
+    })
   }
 
   return json(
