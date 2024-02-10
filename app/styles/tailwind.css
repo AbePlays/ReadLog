@@ -70,3 +70,29 @@
   }
 }
 /* END - Modal Styles */
+
+/* START - Toast Styles */
+@keyframes toast-show {
+  0% {
+    max-height: 0;
+    opacity: 0;
+  }
+
+  100% {
+    max-height: 3rem;
+    opacity: 1;
+  }
+}
+
+@keyframes toast-hide {
+  0% {
+    max-height: 3rem;
+    opacity: 1;
+  }
+
+  100% {
+    max-height: 0;
+    opacity: 0;
+  }
+}
+/* END - Toast Styles */

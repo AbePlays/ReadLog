@@ -1,4 +1,4 @@
-import { type LinksFunction, type LoaderFunctionArgs, json } from '@remix-run/cloudflare'
+import { type ActionFunctionArgs, type LinksFunction, type LoaderFunctionArgs, json } from '@remix-run/cloudflare'
 import {
   Links,
   LiveReload,
@@ -6,18 +6,20 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
-  type ShouldRevalidateFunctionArgs,
   isRouteErrorResponse,
   useLoaderData,
   useRouteError
 } from '@remix-run/react'
 import { Menu } from 'lucide-react'
 import React from 'react'
+import { type ToastMessage, getToast } from 'remix-toast'
 
 import { Navigation } from '~/components/navigation'
 import { IconButton } from '~/components/ui/icon-button'
 import { Modal } from '~/components/ui/modal'
+import { Toast } from '~/components/ui/toast'
 import tailwind from '~/styles/tailwind.css'
+import { cn } from '~/utils/cn'
 import { getUserId } from '~/utils/session.server'
 
 export const links: LinksFunction = () => [
@@ -25,17 +27,24 @@ export const links: LinksFunction = () => [
   { rel: 'stylesheet', href: tailwind }
 ]
 
-export async function loader({ context, request }: LoaderFunctionArgs): AsyncResult<string | undefined> {
+export async function loader({
+  context,
+  request
+}: LoaderFunctionArgs): AsyncResult<{ toast: ToastMessage | undefined; userId: string | undefined }> {
   const userId = await getUserId(request, context)
-  return json({ ok: true, data: userId })
+  const { headers, toast } = await getToast(request)
+
+  return json({ ok: true, data: { toast, userId } }, { headers })
 }
 
-export function shouldRevalidate({ formData = new FormData() }: ShouldRevalidateFunctionArgs) {
-  return Boolean(formData.get('authType'))
+export async function action(_: ActionFunctionArgs) {
+  return null
 }
 
 export default function App() {
-  const { data: userId } = useLoaderData<typeof loader>()
+  const {
+    data: { toast, userId }
+  } = useLoaderData<typeof loader>()
 
   const [showNav, setShowNav] = React.useState(false)
 
@@ -68,13 +77,22 @@ export default function App() {
           <Navigation className="hidden sm:block" isLoggedIn={!!userId} />
         </header>
 
-        <div className="mt-2 sm:rounded-tl-xl sm:border border-gray-200 overflow-hidden bg-white">
-          <main className="p-4 sm:p-8">
-            <Outlet />
-          </main>
-          <footer className="p-4 text-center border-t">
-            <p>Built using Remix and Cloudflare</p>
-          </footer>
+        <div className="mt-2">
+          <Toast toast={toast} />
+
+          <div
+            className={cn(
+              'sm:rounded-tl-xl sm:border border-gray-200 overflow-hidden bg-white h-full transition-[margin]',
+              { 'mt-2': !!toast }
+            )}
+          >
+            <main className="p-4 sm:p-8">
+              <Outlet />
+            </main>
+            <footer className="p-4 text-center border-t">
+              <p>Built using Remix and Cloudflare</p>
+            </footer>
+          </div>
         </div>
 
         <ScrollRestoration />
