@@ -2,6 +2,7 @@ import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, js
 import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
 import { BookText, PenBox } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import { jsonWithSuccess } from 'remix-toast'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
@@ -108,7 +109,7 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       return json({ ok: false, error: 'Failed to update the record. Please try again later.' }, { status: 404 })
     }
 
-    return json({ ok: true, data: record })
+    return jsonWithSuccess({ ok: true, data: record }, 'Your progress has been saved.')
   }
 
   const record = await xata.db.user_books.create({
@@ -128,7 +129,7 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
     user_id: userId
   })
 
-  return json({ ok: true, data: record })
+  return jsonWithSuccess({ ok: true, data: record }, 'Your progress has been saved.')
 }
 
 export default function BookRoute() {

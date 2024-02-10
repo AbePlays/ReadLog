@@ -50,7 +50,7 @@ function Toast(props: ToastProps) {
   const message = toast ? toast.message : toastRef.current?.message
 
   return (
-    <RadixToast.Provider swipeDirection="up" duration={100000}>
+    <RadixToast.Provider swipeDirection="up">
       <RadixToast.Root
         className="ml-2 sm:ml-0 mr-2 overflow-hidden outline-none rounded-lg focus-visible:ring ring-gray-500 motion-safe:data-[state=open]:animate-[toast-show_500ms] motion-safe:data-[state=closed]:animate-[toast-hide_500ms]"
         onOpenChange={() => fetcher.submit(formRef.current)}
