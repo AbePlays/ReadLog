@@ -2,7 +2,7 @@ import { type ActionFunctionArgs, type LoaderFunctionArgs, type MetaFunction, js
 import { Form, useActionData, useLoaderData, useNavigation } from '@remix-run/react'
 import { BookText, PenBox } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { jsonWithSuccess } from 'remix-toast'
+import { jsonWithError, jsonWithSuccess } from 'remix-toast'
 import { useTimer } from 'use-timer'
 import { z } from 'zod'
 
@@ -89,7 +89,11 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
     const history = record.reading_history
 
     if (history.length > 0 && result.data.pageNumber < history[0].page_end) {
-      return json({ ok: false, error: 'Invalid page number. Please check your input and try again.' }, { status: 400 })
+      return jsonWithError(
+        { ok: false, error: 'Invalid page number. Please check your input and try again.' },
+        'Flipped back? Go forward instead!',
+        { status: 400 }
+      )
     }
 
     record = await xata.db.user_books.update(result.data.userBookId, {
@@ -106,7 +110,11 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
     })
 
     if (!record) {
-      return json({ ok: false, error: 'Failed to update the record. Please try again later.' }, { status: 404 })
+      return jsonWithError(
+        { ok: false, error: 'Failed to update the record. Please try again later.' },
+        "An internal error occurred. We're working on it!",
+        { status: 404 }
+      )
     }
 
     return jsonWithSuccess({ ok: true, data: record }, 'Your progress has been saved.')
