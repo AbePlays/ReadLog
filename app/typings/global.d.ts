@@ -1,7 +1,7 @@
 import type { TypedResponse } from '@remix-run/cloudflare'
-import { z } from 'zod'
+import type { z } from 'zod'
 
-import { AppEnvSchema } from '~/schemas/app-env'
+import type { AppEnvSchema } from '~/schemas/app-env'
 
 type Env = z.infer<typeof AppEnvSchema>
 
