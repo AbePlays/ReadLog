@@ -50,22 +50,22 @@ export default function IndexRoute() {
         )}
       </span>
 
-      <dl className="mt-6 border rounded-lg flex divide-x pt-4 pb-8">
-        <div className="pl-8 pr-16">
+      <dl className="mt-6 border rounded-lg md:flex divide-y md:divide-y-0 md:divide-x md:pt-4 md:pb-8">
+        <div className="p-6 md:pl-8 md:pr-16">
           <dt className="text-gray-500 text-sm">Pages read</dt>
           <dd className="block text-3xl">111</dd>
         </div>
-        <div className="pl-8 pr-16">
+        <div className="p-6 md:pl-8 md:pr-16">
           <dt className="text-gray-500 text-sm">Longest streak</dt>
           <dd className="block text-3xl">6</dd>
         </div>
-        <div className="pl-8 pr-16">
+        <div className="p-6 md:pl-8 md:pr-16">
           <dt className="text-gray-500 text-sm">Time spent reading</dt>
           <dd className="block text-3xl">186 mins.</dd>
         </div>
       </dl>
 
-      <div className="mt-6 border rounded-lg p-8">
+      <div className="mt-6 border rounded-lg p-6 md:p-8">
         <h2 className="font-medium">Pages read</h2>
         <LineChart
           categories={['SemiAnalysis']}
@@ -78,8 +78,8 @@ export default function IndexRoute() {
         />
       </div>
 
-      <div className="mt-6 flex gap-6">
-        <div className="border rounded-lg p-8 w-full">
+      <div className="mt-6 flex gap-6 flex-col md:flex-row">
+        <div className="border rounded-lg p-6 md:p-8 w-full">
           <h2 className="font-medium">Longest streak</h2>
           <BarChart
             categories={['SemiAnalysis']}
@@ -91,7 +91,8 @@ export default function IndexRoute() {
             yAxisWidth={48}
           />
         </div>
-        <div className="border rounded-lg p-8 w-full">
+
+        <div className="border rounded-lg p-6 md:p-8 w-full">
           <h2 className="font-medium">Time spent reading</h2>
           <BarChart
             categories={['SemiAnalysis']}
