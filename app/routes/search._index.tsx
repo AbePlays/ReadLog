@@ -3,7 +3,7 @@ import { Form, useLoaderData, useNavigation, useSearchParams } from '@remix-run/
 import { Book, MoveLeft, MoveRight, Search, SearchX } from 'lucide-react'
 
 import { BookCover } from '~/components/book-cover'
-import { Spinner } from '~/components/spinner'
+import { Spinner } from '~/components/spinner/Spinner'
 import { Button } from '~/components/ui/button'
 import { Link } from '~/components/ui/link'
 import { Select } from '~/components/ui/select'
