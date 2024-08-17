@@ -248,10 +248,10 @@ export default function BookRoute() {
       <Modal open={showModal} onOpenChange={setShowModal}>
         <Modal.Content title="Update Reading Progress" onEscapeKeyDown={(e) => e.preventDefault()}>
           <div className="p-4">
-            <p>Keep your reading on track! Please enter the page number you've reached in the book.</p>
+            <p>Keep your reading on track! Please enter the details about your reading session.</p>
 
             <Form method="post">
-              <fieldset disabled={state !== 'idle'}>
+              <fieldset className="space-y-4" disabled={state !== 'idle'}>
                 <input name="bookId" type="hidden" value={loaderData.data.bookDetails.id} />
                 <input name="bookName" type="hidden" value={loaderData.data.bookDetails.volumeInfo.title} />
                 <input
@@ -266,16 +266,37 @@ export default function BookRoute() {
                   value={loaderData.data.userDetails.userBook?.id ?? ''}
                 />
                 <input name="timeSpent" readOnly type="hidden" value={time} />
+                <div>
+                  <label className="font-medium" htmlFor="pageNumber">
+                    Page Number
+                  </label>
+                  <TextField.Root className="mt-2">
+                    <TextField.Input
+                      defaultValue={loaderData.data.userDetails.userBook?.reading_history[0]?.page_end}
+                      id="pageNumber"
+                      name="pageNumber"
+                      type="number"
+                    />
+                  </TextField.Root>
+                </div>
 
-                <label htmlFor="pageNumber">Page Number</label>
-                <TextField.Root className="mt-2">
-                  <TextField.Input
-                    defaultValue={loaderData.data.userDetails.userBook?.reading_history[0]?.page_end}
-                    id="pageNumber"
-                    name="pageNumber"
-                    type="number"
-                  />
-                </TextField.Root>
+                <div>
+                  <label className="font-medium" htmlFor="date">
+                    Date
+                  </label>
+                  <TextField.Root className="mt-2">
+                    <TextField.Input id="date" name="date" type="date" />
+                  </TextField.Root>
+                </div>
+
+                <div>
+                  <label className="font-medium" htmlFor="timeSpent">
+                    Time Spent (eg. 1w 2d 3h)
+                  </label>
+                  <TextField.Root className="mt-2">
+                    <TextField.Input id="timeSpent" name="timeSpent" type="text" />
+                  </TextField.Root>
+                </div>
 
                 <div className="mt-4 space-x-4">
                   <Modal.Close asChild>

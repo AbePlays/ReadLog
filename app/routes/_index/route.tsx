@@ -4,8 +4,9 @@ import { AreaChart, BarChart } from '@tremor/react'
 import { jsonWithError } from 'remix-toast'
 
 import { getDbClient } from '~/libs/db/index.server'
+import { formatNumber } from '~/utils/formatNumber'
 import { getUserId } from '~/utils/session.server'
-import { generateChartData, type ChartData } from './helper.server'
+import { type ChartData, generateChartData } from './helper.server'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Home - ReadLog' }, { name: 'description', content: 'Welcome to ReadLog!' }]
@@ -30,7 +31,7 @@ export async function loader({
     return json({ ok: true, data: { userName: user.fullname ?? 'Guest', chartData: [] } })
   }
 
-  return json({ ok: true, data: { userName: 'Guest', chartData: generateChartData(5) } })
+  return json({ ok: true, data: { userName: 'Guest', chartData: generateChartData(7) } })
 }
 
 export default function IndexRoute() {
@@ -50,18 +51,20 @@ export default function IndexRoute() {
       <dl className="mt-6 border rounded-lg md:flex divide-y md:divide-y-0 md:divide-x md:pt-4 md:pb-8">
         <div className="p-6 md:py-2 md:pl-8 md:pr-16">
           <dt className="text-gray-500 text-sm">Pages read</dt>
-          <dd className="block text-3xl">{chartData.reduce((acc, item) => acc + item['Pages read'], 0)}</dd>
+          <dd className="block text-3xl">
+            {formatNumber(chartData.reduce((acc, item) => acc + item['Pages read'], 0))}
+          </dd>
         </div>
         <div className="p-6 md:py-2 md:pl-8 md:pr-16">
           <dt className="text-gray-500 text-sm">Longest streak</dt>
           <dd className="block text-3xl">
-            {chartData.reduce((acc, item) => Math.max(acc, item['Longest streak']), 0)}
+            {formatNumber(chartData.reduce((acc, item) => Math.max(acc, item['Longest streak']), 0))}
           </dd>
         </div>
         <div className="p-6 md:py-2 md:pl-8 md:pr-16">
           <dt className="text-gray-500 text-sm">Time spent reading</dt>
           <dd className="block text-3xl">
-            {chartData.reduce((acc, item) => acc + item['Time spent reading'], 0)} mins.
+            {formatNumber(chartData.reduce((acc, item) => acc + item['Time spent reading'], 0))} mins.
           </dd>
         </div>
       </dl>
