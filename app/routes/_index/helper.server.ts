@@ -1,30 +1,14 @@
-const data = [
-  {
-    id: '7a6da26b-e0e7-4c66-b11e-75ab3dfe603c',
-    date: '2024-04-07',
-    page_end: 28,
-    page_start: 0,
-    time_spent: 70
-  },
-  {
-    id: '7a6da26b-e0e7-4c66-b11e-75ab3dfe603d',
-    date: '2024-04-07',
-    page_end: 44,
-    page_start: 28,
-    time_spent: 40
-  },
-  {
-    id: '7a6da26b-e0e7-4c66-b11e-75ab3dfe603e',
-    date: '2024-04-08',
-    page_end: 62,
-    page_start: 44,
-    time_spent: 50
-  }
-]
+export type Data = {
+  id: string
+  date: string
+  page_end: number
+  page_start: number
+  time_spent: number
+}
 
 // convert this data to chart data
-export function convertToChartData(input: typeof data): ChartData[] {
-  const result: Record<string, (typeof data)[number][]> = {}
+export function convertToChartData(input: Data[]): ChartData[] {
+  const result: Record<string, Data[]> = {}
   for (const entry of input) {
     if (!result[entry.date]) {
       result[entry.date] = []

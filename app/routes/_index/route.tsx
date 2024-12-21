@@ -6,7 +6,7 @@ import { jsonWithError } from 'remix-toast'
 import { getDbClient } from '~/libs/db/index.server'
 import { formatNumber } from '~/utils/formatNumber'
 import { getUserId } from '~/utils/session.server'
-import { type ChartData, generateChartData } from './helper.server'
+import { type ChartData, type Data, convertToChartData, generateChartData } from './helper.server'
 
 export const meta: MetaFunction = () => {
   return [{ title: 'Home - ReadLog' }, { name: 'description', content: 'Welcome to ReadLog!' }]
@@ -28,7 +28,18 @@ export async function loader({
         { status: 401 }
       )
     }
-    return json({ ok: true, data: { userName: user.fullname ?? 'Guest', chartData: [] } })
+
+    const books = await xata.db.user_books.filter({ user_id: userId }).getAll()
+    const chartData = books.reduce((acc, book) => {
+      acc.push(...book.reading_history)
+      return acc
+    }, [] as Data[])
+
+    if (chartData.length === 0) {
+      return json({ ok: true, data: { userName: user.fullname ?? 'Guest', chartData: [] } })
+    }
+
+    return json({ ok: true, data: { userName: user.fullname ?? 'Guest', chartData: convertToChartData(chartData) } })
   }
 
   return json({ ok: true, data: { userName: 'Guest', chartData: generateChartData(7) } })

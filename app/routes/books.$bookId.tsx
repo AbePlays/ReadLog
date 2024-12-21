@@ -14,8 +14,10 @@ import { TextField } from '~/components/ui/text-field'
 import { getDbClient } from '~/libs/db/index.server'
 import type { UserBooksRecord } from '~/libs/db/xata.server'
 import { BookDetailSchema, type TBook } from '~/schemas/book'
-import { formatTime } from '~/utils/formatTime'
+import { getTodayDate } from '~/utils/date'
 import { getUserId } from '~/utils/session.server'
+import { formatTime, parseTime } from '~/utils/time'
+import type { Data } from './_index/helper.server'
 
 export const meta: MetaFunction<typeof loader> = ({ data: loaderData }) => {
   if (loaderData) {
@@ -69,7 +71,11 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       bookName: z.string(),
       imageUrl: z.string(),
       pageNumber: z.string().transform((val) => +val),
-      timeSpent: z.string().transform((val) => +val),
+      date: z.string(),
+      timeSpent: z
+        .string()
+        .refine((val) => parseTime(val) !== 0)
+        .transform(parseTime),
       userBookId: z.string()
     })
     .safeParse(fields)
@@ -86,7 +92,7 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       return json({ ok: false, error: 'Record not found. Please check your input and try again.' }, { status: 404 })
     }
 
-    const history = record.reading_history
+    const history: Data[] = record.reading_history
 
     if (history.length > 0 && result.data.pageNumber < history[0].page_end) {
       return jsonWithError(
@@ -96,17 +102,16 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       )
     }
 
+    history.push({
+      id: crypto.randomUUID(),
+      date: result.data.date,
+      page_end: result.data.pageNumber,
+      page_start: history[0]?.page_end ?? 0,
+      time_spent: result.data.timeSpent
+    })
+
     record = await xata.db.user_books.update(result.data.userBookId, {
-      reading_history: [
-        {
-          id: crypto.randomUUID(),
-          page_end: result.data.pageNumber,
-          page_start: history[0]?.page_end ?? 0,
-          end_time: new Date(),
-          start_time: new Date(new Date().getTime() - result.data.timeSpent * 1000)
-        },
-        ...history
-      ]
+      reading_history: history.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     })
 
     if (!record) {
@@ -127,10 +132,10 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
     reading_history: [
       {
         id: crypto.randomUUID(),
+        date: result.data.date,
         page_end: result.data.pageNumber,
         page_start: 0,
-        end_time: new Date(),
-        start_time: new Date(new Date().getTime() - result.data.timeSpent * 1000)
+        time_spent: result.data.timeSpent
       }
     ],
     read_status: 'reading',
@@ -285,13 +290,13 @@ export default function BookRoute() {
                     Date
                   </label>
                   <TextField.Root className="mt-2">
-                    <TextField.Input id="date" name="date" type="date" />
+                    <TextField.Input defaultValue={getTodayDate()} id="date" name="date" type="date" />
                   </TextField.Root>
                 </div>
 
                 <div>
                   <label className="font-medium" htmlFor="timeSpent">
-                    Time Spent (eg. 1w 2d 3h)
+                    Time Spent (eg. 1w2d3h)
                   </label>
                   <TextField.Root className="mt-2">
                     <TextField.Input id="timeSpent" name="timeSpent" type="text" />
