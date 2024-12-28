@@ -18,7 +18,7 @@ function removeRemixLinkProps(props: { disabled: true } & Partial<RemixLinkProps
     replace,
     state,
     to,
-    unstable_viewTransition,
+    viewTransition,
     ...rest
   } = props
 
