@@ -2,7 +2,7 @@ import { unstable_useViewTransitionState } from '@remix-run/react'
 
 import type { TBook } from '~/schemas/book'
 import { cn } from '~/utils/cn'
-import Image from '../ui/image'
+import { Image } from '../ui/image'
 
 function BookCover(props: { book: TBook }) {
   const { book } = props
