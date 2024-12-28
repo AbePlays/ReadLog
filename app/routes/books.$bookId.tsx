@@ -9,6 +9,7 @@ import { z } from 'zod'
 import { BackButton } from '~/components/back-button'
 import { ClientOnly } from '~/components/client-only'
 import { Button } from '~/components/ui/button'
+import Image from '~/components/ui/image'
 import { Modal } from '~/components/ui/modal'
 import { TextField } from '~/components/ui/text-field'
 import { getDbClient } from '~/libs/db/index.server'
@@ -179,7 +180,7 @@ export default function BookRoute() {
       <div className="flex justify-between items-start">
         <BackButton className="mt-4 rounded-full" />
         <div className="p-8 bg-stone-50">
-          <img
+          <Image
             alt={`Cover of a book titled ${loaderData.data.bookDetails.volumeInfo.title}`}
             className="aspect-[2/3] [view-transition-name:book-cover]"
             height="300"
