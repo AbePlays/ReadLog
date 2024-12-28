@@ -1,4 +1,4 @@
-import { unstable_useViewTransitionState } from '@remix-run/react'
+import { useViewTransitionState } from '@remix-run/react'
 
 import type { TBook } from '~/schemas/book'
 import { cn } from '~/utils/cn'
@@ -6,7 +6,7 @@ import { Image } from '../ui/image'
 
 function BookCover(props: { book: TBook }) {
   const { book } = props
-  const isTransitioning = unstable_useViewTransitionState(`/books/${book.id}`)
+  const isTransitioning = useViewTransitionState(`/books/${book.id}`)
 
   return (
     <>
