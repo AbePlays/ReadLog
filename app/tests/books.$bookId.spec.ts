@@ -38,6 +38,7 @@ test('has book details on the page for logged in user', async ({ login, page }) 
   page.getByText('Update Reading Progress')
 
   await page.getByLabel('Page Number').fill('10')
+  await page.getByLabel('Time Spent').fill('20m')
   await page.getByRole('button', { name: 'Submit' }).click()
 
   await page.waitForResponse((res) => res.url().includes('books'))

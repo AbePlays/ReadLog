@@ -2,7 +2,7 @@ import * as RadixToast from '@radix-ui/react-toast'
 import { useFetcher } from '@remix-run/react'
 import { AlertCircle, AlertTriangle, CheckCircle2, Info, X } from 'lucide-react'
 import React from 'react'
-import { type ToastMessage } from 'remix-toast'
+import type { ToastMessage } from 'remix-toast'
 
 import { cn } from '~/utils/cn'
 import { IconButton } from '../icon-button'

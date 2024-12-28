@@ -98,7 +98,7 @@ export default function LibraryRoute() {
                         className="block rounded-lg h-full"
                         prefetch="intent"
                         to={`/books/${book.id}`}
-                        unstable_viewTransition
+                        viewTransition
                       >
                         <BookCover book={book} />
                       </Link>

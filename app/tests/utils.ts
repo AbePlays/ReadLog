@@ -1,8 +1,8 @@
+import { readFile } from 'node:fs/promises'
 import { faker } from '@faker-js/faker'
 import { test as base } from '@playwright/test'
 import bcrypt from 'bcryptjs'
 import { parse } from 'cookie'
-import { readFile } from 'fs/promises'
 import type { z } from 'zod'
 
 import { getDbClient } from '~/libs/db/index.server'

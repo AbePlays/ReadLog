@@ -9,13 +9,16 @@ import { z } from 'zod'
 import { BackButton } from '~/components/back-button'
 import { ClientOnly } from '~/components/client-only'
 import { Button } from '~/components/ui/button'
+import { Image } from '~/components/ui/image'
 import { Modal } from '~/components/ui/modal'
 import { TextField } from '~/components/ui/text-field'
 import { getDbClient } from '~/libs/db/index.server'
 import type { UserBooksRecord } from '~/libs/db/xata.server'
 import { BookDetailSchema, type TBook } from '~/schemas/book'
-import { formatTime } from '~/utils/formatTime'
+import { getTodayDate } from '~/utils/date'
 import { getUserId } from '~/utils/session.server'
+import { formatTime, parseTime } from '~/utils/time'
+import type { Data } from './_index/helper.server'
 
 export const meta: MetaFunction<typeof loader> = ({ data: loaderData }) => {
   if (loaderData) {
@@ -69,7 +72,11 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       bookName: z.string(),
       imageUrl: z.string(),
       pageNumber: z.string().transform((val) => +val),
-      timeSpent: z.string().transform((val) => +val),
+      date: z.string(),
+      timeSpent: z
+        .string()
+        .refine((val) => parseTime(val) !== 0)
+        .transform(parseTime),
       userBookId: z.string()
     })
     .safeParse(fields)
@@ -86,7 +93,7 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       return json({ ok: false, error: 'Record not found. Please check your input and try again.' }, { status: 404 })
     }
 
-    const history = record.reading_history
+    const history: Data[] = record.reading_history
 
     if (history.length > 0 && result.data.pageNumber < history[0].page_end) {
       return jsonWithError(
@@ -96,17 +103,16 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
       )
     }
 
+    history.push({
+      id: crypto.randomUUID(),
+      date: result.data.date,
+      page_end: result.data.pageNumber,
+      page_start: history[0]?.page_end ?? 0,
+      time_spent: result.data.timeSpent
+    })
+
     record = await xata.db.user_books.update(result.data.userBookId, {
-      reading_history: [
-        {
-          id: crypto.randomUUID(),
-          page_end: result.data.pageNumber,
-          page_start: history[0]?.page_end ?? 0,
-          end_time: new Date(),
-          start_time: new Date(new Date().getTime() - result.data.timeSpent * 1000)
-        },
-        ...history
-      ]
+      reading_history: history.sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
     })
 
     if (!record) {
@@ -127,10 +133,10 @@ export async function action({ context, request }: ActionFunctionArgs): AsyncRes
     reading_history: [
       {
         id: crypto.randomUUID(),
+        date: result.data.date,
         page_end: result.data.pageNumber,
         page_start: 0,
-        end_time: new Date(),
-        start_time: new Date(new Date().getTime() - result.data.timeSpent * 1000)
+        time_spent: result.data.timeSpent
       }
     ],
     read_status: 'reading',
@@ -174,7 +180,7 @@ export default function BookRoute() {
       <div className="flex justify-between items-start">
         <BackButton className="mt-4 rounded-full" />
         <div className="p-8 bg-stone-50">
-          <img
+          <Image
             alt={`Cover of a book titled ${loaderData.data.bookDetails.volumeInfo.title}`}
             className="aspect-[2/3] [view-transition-name:book-cover]"
             height="300"
@@ -248,10 +254,10 @@ export default function BookRoute() {
       <Modal open={showModal} onOpenChange={setShowModal}>
         <Modal.Content title="Update Reading Progress" onEscapeKeyDown={(e) => e.preventDefault()}>
           <div className="p-4">
-            <p>Keep your reading on track! Please enter the page number you've reached in the book.</p>
+            <p>Keep your reading on track! Please enter the details about your reading session.</p>
 
             <Form method="post">
-              <fieldset disabled={state !== 'idle'}>
+              <fieldset className="space-y-4" disabled={state !== 'idle'}>
                 <input name="bookId" type="hidden" value={loaderData.data.bookDetails.id} />
                 <input name="bookName" type="hidden" value={loaderData.data.bookDetails.volumeInfo.title} />
                 <input
@@ -266,16 +272,37 @@ export default function BookRoute() {
                   value={loaderData.data.userDetails.userBook?.id ?? ''}
                 />
                 <input name="timeSpent" readOnly type="hidden" value={time} />
+                <div>
+                  <label className="font-medium" htmlFor="pageNumber">
+                    Page Number
+                  </label>
+                  <TextField.Root className="mt-2">
+                    <TextField.Input
+                      defaultValue={loaderData.data.userDetails.userBook?.reading_history[0]?.page_end}
+                      id="pageNumber"
+                      name="pageNumber"
+                      type="number"
+                    />
+                  </TextField.Root>
+                </div>
 
-                <label htmlFor="pageNumber">Page Number</label>
-                <TextField.Root className="mt-2">
-                  <TextField.Input
-                    defaultValue={loaderData.data.userDetails.userBook?.reading_history[0]?.page_end}
-                    id="pageNumber"
-                    name="pageNumber"
-                    type="number"
-                  />
-                </TextField.Root>
+                <div>
+                  <label className="font-medium" htmlFor="date">
+                    Date
+                  </label>
+                  <TextField.Root className="mt-2">
+                    <TextField.Input defaultValue={getTodayDate()} id="date" name="date" type="date" />
+                  </TextField.Root>
+                </div>
+
+                <div>
+                  <label className="font-medium" htmlFor="timeSpent">
+                    Time Spent (eg. 1w2d3h)
+                  </label>
+                  <TextField.Root className="mt-2">
+                    <TextField.Input id="timeSpent" name="timeSpent" type="text" />
+                  </TextField.Root>
+                </div>
 
                 <div className="mt-4 space-x-4">
                   <Modal.Close asChild>
